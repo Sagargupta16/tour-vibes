@@ -1,12 +1,13 @@
 .main-nav {
-  height: 100%;
-  padding: 0 1rem;
+  background-color: #2f3640;
+  height: 3.5rem;
   display: flex;
   align-items: center;
-}
-
-.spacer {
-  flex: 1;
+  justify-content: space-between;
+  padding: 0 1rem;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
 }
 
 .main-nav__items {

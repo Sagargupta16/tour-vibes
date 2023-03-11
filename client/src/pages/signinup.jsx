@@ -13,6 +13,9 @@ const signin = () => {
 			  <input type="password" name="password" id="password" placeholder="Enter your password" />
 			  <button type="submit">Sign In</button>
 		  </form>
+		  <div className={classes.signin_form_footer}>
+			  <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+		  </div>
 		</div>
 		<div className={classes.signup_form}>
 		  <h1>Sign Up</h1>
@@ -22,6 +25,9 @@ const signin = () => {
 			  <input type="password" name="password" id="password" placeholder="Enter your password" />
 			  <button type="submit">Sign Up</button>
 		  </form>
+		  <div className={classes.signup_form_footer}>
+			  <p>Already have an account? <a href="/signin">Sign In</a></p>
+		</div>
 		</div>
 	</div>
       

@@ -1,8 +1,8 @@
 .loader {
-    display: inline-block;
-    position: relative;
-    width: 64px;
-    height: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
   .loader div {
     box-sizing: border-box;

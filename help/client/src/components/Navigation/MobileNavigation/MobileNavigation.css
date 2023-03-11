@@ -18,12 +18,14 @@
 }
 
 .mobile-nav__items {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .mobile-nav__items.mobile {
     flex-direction: column;
+    align-items: center;
+    height: 2rem;
+    justify-content: center;
 }

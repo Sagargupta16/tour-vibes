@@ -73,6 +73,7 @@ class Signup extends Component {
     return (
       <Auth>
         <form onSubmit={e => this.props.onSignup(e, this.state)}>
+          <h1>Signup</h1>
           <Input
             id="email"
             label="Your E-Mail"

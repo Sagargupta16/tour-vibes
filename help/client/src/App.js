@@ -12,6 +12,7 @@ import SinglePostPage from './pages/Feed/SinglePost/SinglePost';
 import LoginPage from './pages/Auth/Login';
 import SignupPage from './pages/Auth/Signup';
 import './App.css';
+import HomePage from './pages/Home/Home';
 
 class App extends Component {
   state = {
@@ -163,7 +164,18 @@ class App extends Component {
         <Route
           path="/"
           exact
-          render={props => (
+          render={(props) => (
+            <HomePage
+              {...props}
+              onLogin={this.loginHandler}
+              loading={this.state.authLoading}
+            />
+          )}
+        />
+        <Route
+          path="/signin"
+          exact
+          render={(props) => (
             <LoginPage
               {...props}
               onLogin={this.loginHandler}
@@ -174,7 +186,7 @@ class App extends Component {
         <Route
           path="/signup"
           exact
-          render={props => (
+          render={(props) => (
             <SignupPage
               {...props}
               onSignup={this.signupHandler}
