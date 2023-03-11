@@ -15,7 +15,6 @@ const navbar = () => {
             </div>
             <div>
                 <a href='/'>Sign In</a>
-                <a href='/'>Sign Up</a>
             </div>
         </div>
     </div>
