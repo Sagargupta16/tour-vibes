@@ -1,3 +1,9 @@
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --shade-1: #fdf9ff;
   --shade-2: #f2f2fc;
