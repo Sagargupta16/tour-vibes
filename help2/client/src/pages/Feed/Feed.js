@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+// import jwt from 'jsonwebtoken';
 
 import Post from '../../components/Feed/Post/Post';
 import Button from '../../components/Button/Button';
@@ -17,6 +18,7 @@ class Feed extends Component {
     editPost: null,
     status: '',
     postPage: 1,
+    name: '',
     postsLoading: true,
     editLoading: false
   };
@@ -62,6 +64,8 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        // const newName = jwt.decode(this.props.token);
+        // console.log(newName);
         this.setState({
           posts: resData.posts.map(post => {
             return {
@@ -225,7 +229,7 @@ class Feed extends Component {
           onCancelEdit={this.cancelEditHandler}
           onFinishEdit={this.finishEditHandler}
         />
-        <section className="feed__status">
+        {/* <section className="feed__status">
           <form onSubmit={this.statusUpdateHandler}>
             <Input
               type="text"
@@ -238,8 +242,10 @@ class Feed extends Component {
               Update
             </Button>
           </form>
-        </section>
+        </section> */}
+        {console.log(this.props)}
         <section className="feed__control">
+          <p>{this.props.name}</p>
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>
             New Post
           </Button>

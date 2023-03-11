@@ -21,6 +21,7 @@ class App extends Component {
     showMobileNav: false,
     isAuth: false,
     token: null,
+    name: '',
     userId: null,
     authLoading: false,
     error: null,
@@ -86,6 +87,7 @@ class App extends Component {
         this.setState({
           isAuth: true,
           token: resData.token,
+          name: resData.name,
           authLoading: false,
           userId: resData.userId,
         });
@@ -202,7 +204,7 @@ class App extends Component {
             path="/feeds"
             exact
             render={(props) => (
-              <FeedPage userId={this.state.userId} token={this.state.token} />
+              <FeedPage userId={this.state.userId} token={this.state.token} name={this.state.name} />
             )}
           />
           <Route

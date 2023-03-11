@@ -50,7 +50,8 @@ exports.login = async (req, res, next) => {
                 }, 'somesupersecretsecret', {
                     expiresIn: '1h'
                 });
-                res.status(200).json({token: token, userId: user._id.toString()});
+                console.log(user.name);
+                res.status(200).json({token: token, name: user.name, userId: user._id.toString()});
             } else {
                 const err = new Error('Incorrect password');
                 err.statusCode = 422;
