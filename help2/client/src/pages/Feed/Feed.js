@@ -225,7 +225,7 @@ class Feed extends Component {
           onCancelEdit={this.cancelEditHandler}
           onFinishEdit={this.finishEditHandler}
         />
-        <section className="feed__status">
+        {/* <section className="feed__status">
           <form onSubmit={this.statusUpdateHandler}>
             <Input
               type="text"
@@ -238,6 +238,9 @@ class Feed extends Component {
               Update
             </Button>
           </form>
+        </section> */}
+        <section className="feed__welcome">
+          <h1>Welcome to your feed!</h1>
         </section>
         <section className="feed__control">
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>

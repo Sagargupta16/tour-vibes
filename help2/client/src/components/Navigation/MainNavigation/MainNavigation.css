@@ -1,14 +1,19 @@
 .main-nav {
-  height: 100%;
-  padding: 0 1rem;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  z-index: 10000;
-  /* position: fixed; */
+  height: 4rem;
+  padding: 0 1rem;
+  background-color: #006581;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }
 
-.spacer {
-  flex: 1;
+.main-nav__logo a h1{
+  font-size: 2rem;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  letter-spacing: 5px;
 }
 
 .main-nav__items {
