@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+// import jwt from 'jsonwebtoken';
 
 import Post from '../../components/Feed/Post/Post';
 import Button from '../../components/Button/Button';
@@ -17,6 +18,7 @@ class Feed extends Component {
     editPost: null,
     status: '',
     postPage: 1,
+    name: '',
     postsLoading: true,
     editLoading: false
   };
@@ -62,6 +64,8 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        // const newName = jwt.decode(this.props.token);
+        // console.log(newName);
         this.setState({
           posts: resData.posts.map(post => {
             return {
@@ -239,10 +243,9 @@ class Feed extends Component {
             </Button>
           </form>
         </section> */}
-        <section className="feed__welcome">
-          <h1>Welcome to your feed!</h1>
-        </section>
+
         <section className="feed__control">
+          <p>{this.props.name}</p>
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>
             New Post
           </Button>
