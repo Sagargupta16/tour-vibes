@@ -11,7 +11,11 @@ const myjournal = (props) => {
         <input type="text" placeholder="Search" className={classes.myjournal_search}/>
         <div className={classes.myjournal_cards}>
             {data.map((item, index) => {
-                return <Card key={index} data={item}/>
+                return (
+                  <a href="/blog">
+                    <Card key={index} data={item} />
+                  </a>
+                );
             })}
         </div>
     </div>
