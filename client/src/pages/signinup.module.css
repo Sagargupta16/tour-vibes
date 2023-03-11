@@ -27,7 +27,7 @@
 	height: 100%;
 	background-color: var(--shade-1);
 	border-radius: 10px;
-
+	box-shadow: 0 0 10px 0 var(--shade-4);
 }
 
 .signin_form h1, .signup_form h1{
