@@ -74,6 +74,7 @@ class Login extends Component {
             })
           }
         >
+          <h1>Login</h1>
           <Input
             id="email"
             label="Your E-Mail"

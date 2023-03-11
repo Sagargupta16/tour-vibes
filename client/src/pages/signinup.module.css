@@ -67,3 +67,7 @@
 .signin_form form button:hover, .signup_form form button:hover{
 	background-color: var(--shade-5);
 }
+
+.signup_form{
+	display: none;
+}

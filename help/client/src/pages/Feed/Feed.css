@@ -1,15 +1,21 @@
-.feed__status {
-  width: 90%;
+.feed{
+  width: 100%;
+  max-width: 40rem;
   margin: 1rem auto;
+}
+
+.feed__status {
+  margin-bottom: 1rem;
 }
 
 .feed__status form {
   display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
 .feed__status form * {
-  margin: 0 0.5rem;
+  font-size: 1.2rem;
 }
 
 .feed__control {
@@ -17,12 +23,13 @@
 }
 
 .new-post__preview-image {
-  width: 15rem;
-  height: 7rem;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 @media (min-width: 768px) {
   .feed__status {
-    width: 30rem;
+    width: 40rem;
   }
 }

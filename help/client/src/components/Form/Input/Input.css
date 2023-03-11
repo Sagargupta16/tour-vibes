@@ -1,27 +1,27 @@
 .input {
-  margin: 1rem 0;
-  width: 100%;
+  margin-bottom: 1rem;
 }
 
 .input label {
   display: block;
-  text-transform: uppercase;
-  margin-bottom: 0.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 }
 
 .input input,
 .input textarea {
   display: block;
-  font: inherit;
-  padding: 0.25rem 0.5rem;
   width: 100%;
-  border-radius: 3px;
   border: 1px solid #ccc;
+  font: inherit;
+  line-height: 1.5rem;
+  padding: 0 0.25rem;
 }
 
 .input .touched.invalid {
-    border-color: red;
-    background: #ffc2c2;
+  border-color: #f44336;
+  background-color: #ffd7d7;
+  color: #f44336;
 }
 
 .input input:focus,

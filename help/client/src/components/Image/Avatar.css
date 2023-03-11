@@ -1,7 +1,10 @@
 .avatar {
-    width: 10rem;
-    height: 10rem;
-    margin: 0.5rem auto;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    overflow: hidden;
+    background-color: #e0e0e0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }

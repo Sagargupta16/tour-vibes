@@ -1,8 +1,9 @@
 .main-header {
-  width: 100%;
   position: fixed;
-  left: 0;
   top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
 }
 
 .content {
@@ -12,7 +13,6 @@
 
 @media (min-width: 768px) {
   .content {
-    margin-top: 3.5rem;
     padding: 1rem 2rem;
   }
 }

@@ -23,9 +23,9 @@ function App() {
   return (
     <div className="App">
       <Navbar/>
-      <Journal data={data} title={"My Blogs"}/>
+      {/* <Journal data={data} title={"My Blogs"}/>
       <Journal data={data} title={"Feeds"}/>
-      <Journal data={data} title={"My Favourites"}/>
+      <Journal data={data} title={"My Favourites"}/> */}
       <Signinup/>
     </div>
   );
