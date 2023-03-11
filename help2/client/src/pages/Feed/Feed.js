@@ -243,7 +243,7 @@ class Feed extends Component {
             </Button>
           </form>
         </section> */}
-        {console.log(this.props)}
+
         <section className="feed__control">
           <p>{this.props.name}</p>
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>

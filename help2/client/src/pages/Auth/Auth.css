@@ -1,14 +1,41 @@
 .auth-form {
-    width: 90%;
-    margin: auto;
-    padding: 1rem;
-    border: 1px solid #3b0062;
-    border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 3px #ccc;
+}
+
+.auth-form form {
+  width: 100%;
+}
+
+.auth-form form h1 {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.auth-form Input,
+.auth-form Button {
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 3px #ccc;
+}
+
+@media (min-width: 768px) {
+  .auth-form {
+    width: 40rem;
   }
-  
-  @media (min-width: 768px) {
-    .auth-form {
-      width: 40rem;
-    }
-  }
-  
+}
