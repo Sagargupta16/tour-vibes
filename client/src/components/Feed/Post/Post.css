@@ -39,6 +39,14 @@
   align-items: center;
 }
 
+.post__content{
+  font-size: 1.2rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 1rem 0;
+}
+
 @media (min-width: 768px) {
   .post {
     padding: 1rem;

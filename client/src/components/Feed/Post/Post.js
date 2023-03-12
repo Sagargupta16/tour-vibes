@@ -19,12 +19,12 @@ const post = props => (
       <Button mode="flat" link={`feeds/`+props.id}>
         View
       </Button>
-      {/* <Button mode="flat" onClick={props.onStartEdit}>
+      <Button mode="flat" onClick={props.onStartEdit}>
         Edit
       </Button>
       <Button mode="flat" design="danger" onClick={props.onDelete}>
         Delete
-      </Button> */}
+      </Button>
     </div>
   </article>
 );
