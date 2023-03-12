@@ -21,6 +21,12 @@
   text-align: center;
 }
 
+.feed__control p{
+  font-size: 1.5rem;
+  margin: 1.5rem 0;
+
+}
+
 .new-post__preview-image {
   width: 15rem;
   height: 7rem;

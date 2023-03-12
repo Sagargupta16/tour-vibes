@@ -52,7 +52,8 @@ exports.login = async (req, res, next) => {
                 });
                 console.log(user.name);
                 res.status(200).json({token: token, name: user.name, userId: user._id.toString()});
-            } else {
+            } 
+            else {
                 const err = new Error('Incorrect password');
                 err.statusCode = 422;
                 throw err;

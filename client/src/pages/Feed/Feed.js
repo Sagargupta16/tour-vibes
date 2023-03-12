@@ -245,7 +245,7 @@ class Feed extends Component {
         </section> */}
 
         <section className="feed__control">
-          <p>{this.props.name}</p>
+          <p> Welcome {this.props.name}</p>
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>
             New Post
           </Button>

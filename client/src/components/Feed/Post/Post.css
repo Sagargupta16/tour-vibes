@@ -1,29 +1,42 @@
 .post {
+  width: 100%;
+  padding: 1rem;
   margin: 1rem 0;
-  border: 1px solid #3b0062;
-  border-radius: 5px;
-  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }
 
 .post__meta {
-  font-size: 1rem;
-  color: #707070;
-  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .post__title {
   font-size: 1.5rem;
-  margin: 1rem 0;
-  color: #3b0062;
+  margin: 0;
 }
 
 .post__image {
-  height: 15rem;
   width: 100%;
+  height: 15rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.post__image img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .post__actions {
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 @media (min-width: 768px) {
