@@ -2,7 +2,12 @@
   width: 90%;
   margin: auto;
   text-align: center;
-  color: #3b0062;
+}
+
+.single-post h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 1rem 0;
 }
 
 .single-post h2 {
@@ -13,9 +18,17 @@
 }
 
 .single-post__image {
-  height: 20rem;
-  width: 20rem;
-  margin: 1rem auto;
+  height: 100%;
+  width: 100%;
+}
+
+.single-post p{
+  margin: 1rem 0;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #000;
+  opacity: 1;
 }
 
 @media (min-width: 768px) {

@@ -1,5 +1,6 @@
 .image {
     width: 100%;
-    height: 100%;
-    background-repeat: no-repeat;
+    height: 25rem;
+    object-fit: fill;
+    opacity: 1;
 }

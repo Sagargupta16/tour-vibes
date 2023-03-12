@@ -30,6 +30,7 @@
     top: 0;
     bottom: 0;
     object-fit: cover;
+    opacity: 1;
 }
 
 .home .homeContent{
