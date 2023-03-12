@@ -2,9 +2,9 @@
   position: fixed;
   width: 90%;
   left: 5%;
-  top: 20vh;
+  top: 5rem;
   background: white;
-  border-radius: 5px;
+  border-radius: 10px;
   z-index: 200;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }

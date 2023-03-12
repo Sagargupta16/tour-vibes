@@ -17,6 +17,7 @@ class PersonalFeed extends Component {
     editPost: null,
     status: '',
     postPage: 1,
+    name: localStorage.getItem('name'),
     postsLoading: true,
     editLoading: false
   };
@@ -240,6 +241,7 @@ class PersonalFeed extends Component {
             </Button>
           </form>
         </section> */}
+        <p className="text" > Welcome {this.state.name} </p>
         <section className="feed__control">
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>
             New Post
@@ -247,26 +249,26 @@ class PersonalFeed extends Component {
         </section>
         <section className="feed">
           {this.state.postsLoading && (
-            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <div style={{ textAlign: "center", marginTop: "2rem" }}>
               <Loader />
             </div>
           )}
           {this.state.posts.length <= 0 && !this.state.postsLoading ? (
-            <p style={{ textAlign: 'center' }}>No posts found.</p>
+            <p style={{ textAlign: "center" }}>No posts found.</p>
           ) : null}
           {!this.state.postsLoading && (
             <Paginator
-              onPrevious={this.loadPosts.bind(this, 'previous')}
-              onNext={this.loadPosts.bind(this, 'next')}
+              onPrevious={this.loadPosts.bind(this, "previous")}
+              onNext={this.loadPosts.bind(this, "next")}
               lastPage={Math.ceil(this.state.totalPosts / 2)}
               currentPage={this.state.postPage}
             >
-              {this.state.posts.map(post => (
+              {this.state.posts.map((post) => (
                 <MyPost
                   key={post._id}
                   id={post._id}
                   author={post.creator.name}
-                  date={new Date(post.createdAt).toLocaleDateString('en-US')}
+                  date={new Date(post.createdAt).toLocaleDateString("en-US")}
                   title={post.title}
                   image={post.imageUrl}
                   content={post.content}

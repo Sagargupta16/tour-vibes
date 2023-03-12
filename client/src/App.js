@@ -93,6 +93,7 @@ class App extends Component {
         });
         localStorage.setItem("token", resData.token);
         localStorage.setItem("userId", resData.userId);
+        localStorage.setItem("name", resData.name);
         const remainingMilliseconds = 60 * 60 * 1000;
         const expiryDate = new Date(
           new Date().getTime() + remainingMilliseconds

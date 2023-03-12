@@ -1,3 +1,11 @@
+.paginator {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 2rem auto;
+  width: 100%;
+}
+
 .paginator__controls {
   display: flex;
   justify-content: center;

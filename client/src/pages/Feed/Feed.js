@@ -4,7 +4,7 @@ import React, { Component, Fragment } from 'react';
 import Post from '../../components/Feed/Post/Post';
 import Button from '../../components/Button/Button';
 import FeedEdit from '../../components/Feed/FeedEdit/FeedEdit';
-import Input from '../../components/Form/Input/Input';
+// import Input from '../../components/Form/Input/Input';
 import Paginator from '../../components/Paginator/Paginator';
 import Loader from '../../components/Loader/Loader';
 import ErrorHandler from '../../components/ErrorHandler/ErrorHandler';
@@ -18,7 +18,7 @@ class Feed extends Component {
     editPost: null,
     status: '',
     postPage: 1,
-    name: '',
+    name: localStorage.getItem('name'),
     postsLoading: true,
     editLoading: false
   };
@@ -244,8 +244,8 @@ class Feed extends Component {
           </form>
         </section> */}
 
+        <p className='text'> Welcome {this.state.name} !</p>
         <section className="feed__control">
-          <p> Welcome {this.props.name}</p>
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>
             New Post
           </Button>

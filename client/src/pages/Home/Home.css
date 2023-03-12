@@ -1,22 +1,4 @@
 
-
-:root{
-    --PrimaryColor: hsl(199,100%,33%);
-    --SecondaryColor: hsl(187,85%, 43%);
-    --gradientColor: linear-gradient(to right, hsl(187,85%, 43%), hsl(199,100%,33%));
-    --whiteColor: hsl(0,0%,100%);
-    --blackColor: hsl(201,33%,16%);
-    --textColor: hsl(240, 4%, 36%);
-    --whiteColorDeam: hsl(0,0%,93%);
-    --greyText:rgb(190,190,190);
-    --inputColor: rgb(239,239,239);
-    --bodyColor: rgb(240,240,246);
-    --cardBG: rgb(225,225,235);
-}
-
-
-
-
 .home{
     width: 100%;
     position: fixed;
@@ -24,12 +6,9 @@
     left: 0;
     display: flex;
     align-items: center;
-    /* justify-content: center; */
-    /* margin: auto; */
     font-family: 'Freehand', sans-serif;
     padding : 0;
     margin: 0;
-    /* box-sizing: border-box; */
 }
  
 
@@ -63,13 +42,18 @@
     align-items: stretch;
     justify-content: center;
     margin: auto;
-    color: var(--whiteColor);
+    color: white;
     z-index: 100;
 }
 
 .home .homeContent .textDiv{
     padding: 5rem 0;
 }
+
+.textDiv {
+    text-shadow: 10px 5px rgba(0,0,0,0.5);
+}
+
 .home .homeContent .textDiv .smallText{
     font-size: 3rem;
     text-transform: uppercase;

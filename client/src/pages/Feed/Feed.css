@@ -1,35 +1,43 @@
-.feed__status {
-  width: 90%;
-  margin: 1rem auto;
-}
 
-/* .feed__status form {
-  display: flex;
-  align-items: center;
-}
-
-.feed__status form * {
-  margin: 0 0.5rem;
-} */
 
 .feed__welcome {
   width: 100%;
   text-align: center;
-  margin: 1rem auto;
+  margin: 0 auto;
 }
+
 .feed__control {
-  text-align: center;
+  margin-top: -4rem;;
+  width: 90%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  
 }
 
-.feed__control p{
-  font-size: 1.5rem;
+.text{
+  width: 100%;
+  font-size: 2rem;
   margin: 1.5rem 0;
-
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Freehand';
 }
 
 .new-post__preview-image {
   width: 15rem;
   height: 7rem;
+}
+
+.feed{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5rem;
 }
 
 @media (min-width: 768px) {
