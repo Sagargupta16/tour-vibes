@@ -20,15 +20,21 @@
 .single-post__image {
   height: 100%;
   width: 100%;
+  border-radius: 1rem;
 }
 
 .single-post p{
   margin: 1rem 0;
-  font-size: 1.4rem;
-  line-height: 1.5;
-  font-weight: 400;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  font-weight: 600;
   color: #000;
-  opacity: 1;
+  text-align:justify;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  opacity: 0.9;
 }
 
 @media (min-width: 768px) {
