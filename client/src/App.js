@@ -202,21 +202,21 @@ class App extends Component {
             )}
           />
           <Route
-            path="/feeds"
+            path="/journals"
             exact
             render={(props) => (
               <FeedPage userId={this.state.userId} token={this.state.token} name={this.state.name} />
             )}
           />
           <Route
-            path="/myfeeds"
+            path="/myjournals"
             exact
             render={(props) => (
               <PersonalFeed userId={this.state.userId} token={this.state.token} />
             )}
           />
           <Route
-            path="/feeds/:postId"
+            path="/journals/:postId"
             render={(props) => (
               <SinglePostPage
                 {...props}

@@ -4,8 +4,8 @@ import { NavLink } from "react-router-dom";
 import "./NavigationItems.css";
 
 const navItems = [
-  { id: "feed", text: "Feed", link: "/feeds", auth: true },
-  { id: "myfeeds", text: "My Feeds", link: "/myfeeds", auth: true },
+  { id: "feed", text: "Journals", link: "/journals", auth: true },
+  { id: "myfeeds", text: "My Journals", link: "/myjournals", auth: true },
   { id: "login", text: "Login", link: "/login", auth: false },
   { id: "signup", text: "Signup", link: "/signup", auth: false },
 ];
