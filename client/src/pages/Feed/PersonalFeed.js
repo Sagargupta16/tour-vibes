@@ -241,7 +241,7 @@ class PersonalFeed extends Component {
             </Button>
           </form>
         </section> */}
-        <p className="text" > Welcome {this.state.name} </p>
+        <p className="text" > Welcome {this.state.name} ! </p>
         <section className="feed__control">
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>
             New Post
@@ -254,7 +254,7 @@ class PersonalFeed extends Component {
             </div>
           )}
           {this.state.posts.length <= 0 && !this.state.postsLoading ? (
-            <p style={{ textAlign: "center" }}>No posts found.</p>
+            <p className='no-post'>No posts found.</p>
           ) : null}
           {!this.state.postsLoading && (
             <Paginator

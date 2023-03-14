@@ -37,8 +37,9 @@
 
 .post__actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 3rem;
 }
 
 .post__content{

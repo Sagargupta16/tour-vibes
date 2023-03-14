@@ -257,7 +257,7 @@ class Feed extends Component {
             </div>
           )}
           {this.state.posts.length <= 0 && !this.state.postsLoading ? (
-            <p style={{ textAlign: 'center' }}>No posts found.</p>
+            <p className='no-post'>No posts found.</p>
           ) : null}
           {!this.state.postsLoading && (
             <Paginator

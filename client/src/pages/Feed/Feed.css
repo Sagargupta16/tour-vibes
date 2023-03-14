@@ -5,6 +5,16 @@
   margin: 0 auto;
 }
 
+.no-post {
+  height : 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: larger;
+  font-weight: bold;
+}
+
 .feed__control {
   margin-top: -4.5rem;;
   width: 90%;
