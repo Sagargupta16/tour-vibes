@@ -12,7 +12,10 @@ export function length({ min, max }) {
 }
 
 export function email(value) {
-   return /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/.test(
-      value
-   );
+   const parts = value.split('@');
+   if (parts.length !== 2) return false;
+   const [local, domain] = parts;
+   if (!local || !domain) return false;
+   if (domain.indexOf('.') === -1) return false;
+   return local.length <= 64 && domain.length <= 253;
 }
