@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/sonner';
 import App from '@/App';
+import '@fontsource-variable/inter';
 import './index.css';
 
 createRoot(document.getElementById('root')).render(

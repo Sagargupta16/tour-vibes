@@ -24,7 +24,7 @@ async function request(path, options = {}) {
       localStorage.removeItem('expiryDate');
       localStorage.removeItem('userId');
       localStorage.removeItem('name');
-      window.dispatchEvent(new Event('auth:expired'));
+      globalThis.dispatchEvent(new Event('auth:expired'));
       throw new Error('Session expired');
    }
 

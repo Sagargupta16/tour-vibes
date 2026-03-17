@@ -50,11 +50,13 @@ export default function CommentList({ postId }) {
          <h3 className="text-lg font-semibold">Comments ({comments.length})</h3>
          <CommentForm postId={postId} onCommentAdded={handleAdd} />
          <Separator />
-         {loading ? (
+         {loading && (
             <p className="text-sm text-muted-foreground">Loading comments...</p>
-         ) : comments.length === 0 ? (
+         )}
+         {!loading && comments.length === 0 && (
             <p className="text-sm text-muted-foreground">No comments yet. Be the first!</p>
-         ) : (
+         )}
+         {!loading && comments.length > 0 && (
             <div className="space-y-4">
                {comments.map((c) => (
                   <div key={c._id} className="flex gap-3">

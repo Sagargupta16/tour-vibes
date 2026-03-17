@@ -58,18 +58,20 @@ export default function MyJournals() {
                </Button>
             </div>
 
-            {loading ? (
+            {loading && (
                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {[1, 2, 3].map((i) => (
                      <SkeletonCard key={i} />
                   ))}
                </div>
-            ) : posts.length === 0 ? (
+            )}
+            {!loading && posts.length === 0 && (
                <EmptyState
                   title="No journals yet"
                   description="Create your first travel journal!"
                />
-            ) : (
+            )}
+            {!loading && posts.length > 0 && (
                <>
                   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                      {posts.map((post) => (

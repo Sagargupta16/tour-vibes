@@ -16,6 +16,6 @@ export function email(value) {
    if (parts.length !== 2) return false;
    const [local, domain] = parts;
    if (!local || !domain) return false;
-   if (domain.indexOf('.') === -1) return false;
+   if (!domain.includes('.')) return false;
    return local.length <= 64 && domain.length <= 253;
 }

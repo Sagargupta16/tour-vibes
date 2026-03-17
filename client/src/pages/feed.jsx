@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useFeed from '@/hooks/use-feed';
@@ -52,20 +51,22 @@ export default function Feed() {
                <TagFilter activeTag={tag} onTagChange={setTag} />
             </div>
 
-            {loading ? (
+            {loading && (
                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {[1, 2, 3].map((i) => (
                      <SkeletonCard key={i} />
                   ))}
                </div>
-            ) : posts.length === 0 ? (
+            )}
+            {!loading && posts.length === 0 && (
                <EmptyState
                   title="No journals found"
                   description={
                      search ? 'Try a different search term' : 'Be the first to share a story!'
                   }
                />
-            ) : (
+            )}
+            {!loading && posts.length > 0 && (
                <>
                   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                      {posts.map((post) => (

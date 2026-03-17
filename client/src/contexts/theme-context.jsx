@@ -1,6 +1,14 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 const ThemeContext = createContext();
+
+function getSystemTheme() {
+   return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function resolveTheme(theme) {
+   return theme === 'system' ? getSystemTheme() : theme;
+}
 
 export function ThemeProvider({ children }) {
    const [theme, setTheme] = useState(() => {
@@ -10,12 +18,7 @@ export function ThemeProvider({ children }) {
    useEffect(() => {
       const root = document.documentElement;
       const applyTheme = () => {
-         const resolved =
-            theme === 'system'
-               ? window.matchMedia('(prefers-color-scheme: dark)').matches
-                  ? 'dark'
-                  : 'light'
-               : theme;
+         const resolved = resolveTheme(theme);
          root.classList.remove('light', 'dark');
          root.classList.add(resolved);
       };
@@ -23,23 +26,17 @@ export function ThemeProvider({ children }) {
       applyTheme();
       localStorage.setItem('theme', theme);
 
-      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const mq = globalThis.matchMedia('(prefers-color-scheme: dark)');
       mq.addEventListener('change', applyTheme);
       return () => mq.removeEventListener('change', applyTheme);
    }, [theme]);
 
-   const resolvedTheme =
-      theme === 'system'
-         ? window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light'
-         : theme;
-
-   return (
-      <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
-         {children}
-      </ThemeContext.Provider>
+   const value = useMemo(
+      () => ({ theme, setTheme, resolvedTheme: resolveTheme(theme) }),
+      [theme]
    );
+
+   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

@@ -162,7 +162,8 @@ export default function PostForm({ open, onOpenChange, editPost, onSubmit }) {
                   />
                </div>
                <Button type="submit" className="w-full" disabled={submitting}>
-                  {submitting ? 'Saving...' : editPost ? 'Update' : 'Create'}
+                  {submitting && 'Saving...'}
+                  {!submitting && (editPost ? 'Update' : 'Create')}
                </Button>
             </form>
          </DialogContent>

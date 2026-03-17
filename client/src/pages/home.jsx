@@ -35,7 +35,7 @@ export default function Home() {
                transition={{ duration: 0.5 }}
             >
                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
-                  Your Travel
+                  <span>Your Travel</span>
                   <span className="block bg-gradient-to-r from-neutral-600 to-neutral-400 bg-clip-text text-transparent dark:from-neutral-300 dark:to-neutral-500">
                      Journal Awaits
                   </span>
