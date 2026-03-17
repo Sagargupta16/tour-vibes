@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Every file must stay under 250 lines.** If a file approaches this limit, split it into smaller, focused modules.
 - **Always use latest stable versions** of dependencies, APIs, and language features. No deprecated patterns.
 - **Follow current best practices** -- functional components with hooks (no class components), async/await (no .then chains), ES module-style imports where possible, proper error handling.
-- 3-space indentation (`.editorconfig`).
+- 3-space indentation (`.editorconfig` + `.prettierrc`).
 - Conventional commits: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`.
 
 ## Development Commands
@@ -18,29 +18,36 @@ npm run dev
 
 # Individual
 npm run server     # Express on port 8000 (nodemon)
-npm run client     # CRA React on port 3000
+npm run client     # Vite React on port 3000
 
 # Install all deps
 npm run install:all
 
 # Build frontend
 npm run build
+
+# Format all code
+npm run format
+npm run format:check   # CI-friendly, no writes
 ```
 
 ## Environment Setup
 
-Copy `server/.env.example` to `server/.env` and fill in:
+**Server:** Copy `server/.env.example` to `server/.env`:
 - `MONGODB_URI` -- MongoDB Atlas connection string
 - `JWT_SECRET` -- required, server won't start without it
 - `PORT` -- defaults to 8000
 - `CLIENT_URL` -- defaults to `http://localhost:3000` (used for CORS)
+
+**Client:** Copy `client/.env.example` to `client/.env`:
+- `VITE_API_URL` -- defaults to `http://localhost:8000`
 
 ## Architecture
 
 Root `package.json` uses `concurrently` to run both packages:
 
 ```
-client/   -- React 18 SPA (CRA, react-scripts 5, react-router-dom 7)
+client/   -- Vite + React 19 SPA (Tailwind CSS 4 + shadcn/ui)
 server/   -- Express 5 REST API with MongoDB (Mongoose 9)
 ```
 
@@ -53,6 +60,7 @@ Entry point: `app.js` -- Express, Multer (5MB limit, PNG/JPG only), CORS, MongoD
 - `controllers/feed.js` / `controllers/auth.js` / `controllers/comment.js`
 - `models/post.js` / `models/users.js` / `models/comment.js`
 - `middleware/is-auth.js` -- JWT verification from `process.env.JWT_SECRET`
+- `util/helpers.js` -- shared pagination, path normalization, image cleanup
 
 **Key patterns:**
 - All mutations check ownership (`post.creator === req.userId`)
@@ -63,12 +71,26 @@ Entry point: `app.js` -- Express, Multer (5MB limit, PNG/JPG only), CORS, MongoD
 
 ### Frontend (`client/src/`)
 
-Functional components with hooks. Auth state in `App.js` via `useState`, stored in localStorage.
+Vite + React 19 + Tailwind CSS 4 + shadcn/ui. Minimalist/clean design with dark mode.
 
-- `pages/` -- Home, Auth (Login/Signup), Feed (Feed, PersonalFeed, SinglePost)
-- `components/` -- Layout, Navigation, Feed/Post, Form inputs, Modal, Paginator, ErrorHandler
-- Routing: react-router-dom v7 (`Routes`/`Route`/`Navigate`/`useNavigate`/`useParams`)
-- Styling: plain CSS files per component
+- `contexts/` -- `AuthContext` (token, login, signup, logout), `ThemeContext` (dark/light/system)
+- `hooks/` -- `use-feed.js` (CRUD + search/sort/tag), `use-debounce.js`
+- `lib/` -- `api.js` (centralized fetch, auto Bearer token, 401 handling), `validators.js`
+- `components/ui/` -- shadcn/ui primitives (Button, Card, Dialog, Sheet, etc.)
+- `components/layout/` -- header, mobile-nav, root-layout
+- `components/feed/` -- post-card, post-form, search-bar, tag-filter, sort-select, pagination
+- `components/post/` -- like-button, comment-list, comment-form
+- `components/profile/` -- profile-form, password-form
+- `components/shared/` -- page-transition (Framer Motion), skeleton loaders, empty-state
+- `pages/` -- home, login, signup, feed, my-journals, single-post, profile, not-found
+
+**Key patterns:**
+- API base URL from `VITE_API_URL` env var (no hardcoded URLs)
+- Auth via `useAuth()` context hook (no prop drilling)
+- Dark/light mode via `useTheme()` with localStorage persistence
+- Feed state in URL search params (shareable/bookmarkable)
+- Toast notifications (sonner) on all user actions
+- Framer Motion page transitions and hover effects
 
 ### API Endpoints
 

@@ -13,10 +13,14 @@ A full-stack travel journal web application built with the MERN stack. Share tra
 - **Search** -- full-text search across titles, content, and tags
 - **Rate Limiting** -- auth endpoints rate-limited to prevent brute force
 - **Responsive Design** -- mobile-friendly with hamburger navigation
+- **Dark/Light Mode** -- system-aware theme with manual toggle
+- **Animations** -- page transitions, hover effects, scroll animations (Framer Motion)
+- **Toast Notifications** -- feedback on every user action
+- **Skeleton Loading** -- content-shaped placeholders while loading
 
 ## Tech Stack
 
-**Frontend:** React 18, React Router 7, CSS3
+**Frontend:** Vite 7, React 19, Tailwind CSS 4, shadcn/ui, Framer Motion, Sonner
 **Backend:** Express 5, Mongoose 9, MongoDB Atlas
 **Auth:** JWT + bcryptjs
 **Uploads:** Multer (local disk, 5MB limit, PNG/JPG only)
@@ -100,10 +104,16 @@ Frontend runs on http://localhost:3000, backend on http://localhost:8000.
 ```
 tour-vibes/
 ├── client/src/
-│   ├── components/       # Reusable UI components
-│   ├── hooks/            # Custom hooks (useFeed)
-│   ├── pages/            # Route pages (Home, Auth, Feed)
-│   └── util/             # Validators, image helpers
+│   ├── components/ui/    # shadcn/ui primitives
+│   ├── components/layout/# Header, mobile nav, root layout
+│   ├── components/feed/  # Post card, post form, search, tags, sort
+│   ├── components/post/  # Like button, comments
+│   ├── components/profile/# Profile + password forms
+│   ├── components/shared/# Page transitions, skeletons, empty state
+│   ├── contexts/         # Auth + Theme providers
+│   ├── hooks/            # useFeed, useDebounce
+│   ├── lib/              # API client, validators, utils
+│   └── pages/            # Home, Login, Signup, Feed, Profile, 404
 ├── server/
 │   ├── controllers/      # Route handlers (auth, feed, comment)
 │   ├── middleware/        # JWT auth middleware

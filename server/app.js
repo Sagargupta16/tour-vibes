@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
@@ -37,20 +38,13 @@ app.use(
 );
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-const CLIENT_URL = process.env.CLIENT_URL;
-
-app.use((req, res, next) => {
-   if (!CLIENT_URL) {
-      console.warn('CLIENT_URL not set -- CORS is open to all origins');
-   }
-   res.setHeader('Access-Control-Allow-Origin', CLIENT_URL || '*');
-   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, PATCH');
-   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-   if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-   }
-   next();
-});
+app.use(
+   cors({
+      origin: process.env.CLIENT_URL || 'http://localhost:3000',
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+   })
+);
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes);
