@@ -1,18 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&family=Freehand:wght@300;400;500;600;700&display=swap');
 
 * {
-  box-sizing: border-box;
+   box-sizing: border-box;
 }
 
 body {
-    font-family:  sans-serif;
-    margin: 0;
-    padding: 0;
-    background-image : url("background2.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    opacity: 0.9;
-
+   font-family: sans-serif;
+   margin: 0;
+   padding: 0;
+   background-image: url('background2.jpg');
+   background-repeat: no-repeat;
+   background-size: cover;
+   background-position: center;
+   background-attachment: fixed;
+   opacity: 0.9;
 }

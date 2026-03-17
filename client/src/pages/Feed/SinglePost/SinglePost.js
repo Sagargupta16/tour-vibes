@@ -1,59 +1,53 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import Image from '../../../components/Image/Image';
 import './SinglePost.css';
 
-class SinglePost extends Component {
-  state = {
-    title: '',
-    author: '',
-    date: '',
-    image: '',
-    content: ''
-  };
+function SinglePost({ token }) {
+   const { postId } = useParams();
+   const [title, setTitle] = useState('');
+   const [author, setAuthor] = useState('');
+   const [date, setDate] = useState('');
+   const [image, setImage] = useState('');
+   const [content, setContent] = useState('');
 
-  componentDidMount() {
-    const postId = this.props.match.params.postId;
-    fetch('http://localhost:8000/feed/post/'+postId, {
-      headers: {
-        'Authorization': 'Bearer ' + this.props.token
-      }
-    })
-      .then(res => {
-        if (res.status !== 200) {
-          throw new Error('Failed to fetch status');
-        }
-        return res.json();
+   useEffect(() => {
+      fetch('http://localhost:8000/feed/post/' + postId, {
+         headers: {
+            Authorization: 'Bearer ' + token
+         }
       })
-      .then(resData => {
-        console.log(resData);
-        this.setState({
-          title: resData.post.title,
-          author: resData.post.creator.name,
-          image: 'http://localhost:8000/'+resData.post.imageUrl,
-          date: new Date(resData.post.createdAt).toLocaleDateString('en-US'),
-          content: resData.post.content
-        });
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
+         .then((res) => {
+            if (res.status !== 200) {
+               throw new Error('Failed to fetch status');
+            }
+            return res.json();
+         })
+         .then((resData) => {
+            setTitle(resData.post.title);
+            setAuthor(resData.post.creator.name);
+            setImage('http://localhost:8000/' + resData.post.imageUrl);
+            setDate(new Date(resData.post.createdAt).toLocaleDateString('en-US'));
+            setContent(resData.post.content);
+         })
+         .catch((err) => {
+            console.log(err);
+         });
+   }, [postId, token]);
 
-  render() {
-    return (
+   return (
       <section className="single-post">
-        <h1>{this.state.title}</h1>
-        <h2>
-          Created by {this.state.author} on {this.state.date}
-        </h2>
-        <div className="single-post__image">
-          <Image contain imageUrl={this.state.image} />
-        </div>
-        <p>{this.state.content}</p>
+         <h1>{title}</h1>
+         <h2>
+            Created by {author} on {date}
+         </h2>
+         <div className="single-post__image">
+            <Image contain imageUrl={image} />
+         </div>
+         <p>{content}</p>
       </section>
-    );
-  }
+   );
 }
 
 export default SinglePost;

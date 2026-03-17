@@ -1,24 +1,65 @@
 const express = require('express');
-const validator = require('express-validator');
+const { body } = require('express-validator');
+const rateLimit = require('express-rate-limit');
 
 const authControllers = require('../controllers/auth');
 const User = require('../models/users');
+const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
-const validation = [
-    validator.body('email').isEmail().withMessage('Enter a valid email-id')
-    .custom(async value => {
-        const user = await User.findOne({ email: value });
-        if (user) {
-            return Promise.reject('User already registered');
-        }
-    }).normalizeEmail({gmail_remove_dots: false}),
-    validator.body('password').trim().isLength({min: 5}).withMessage('Enter correct password of length more than 5 letters'),
-    validator.body('name').trim().not().isEmpty().withMessage('Name cannot be empty')
+const authLimiter = rateLimit({
+   windowMs: 15 * 60 * 1000,
+   max: 20,
+   message: { message: 'Too many attempts, please try again after 15 minutes' }
+});
+
+const signupValidation = [
+   body('email')
+      .isEmail()
+      .withMessage('Enter a valid email')
+      .custom(async (value) => {
+         const user = await User.findOne({ email: value });
+         if (user) {
+            throw new Error('Email already registered');
+         }
+      })
+      .normalizeEmail({ gmail_remove_dots: false }),
+   body('password')
+      .trim()
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
+   body('name').trim().not().isEmpty().withMessage('Name is required')
 ];
 
-router.put('/signup', validation, authControllers.signup);
-router.post('/login', authControllers.login);
+const loginValidation = [
+   body('email')
+      .isEmail()
+      .withMessage('Enter a valid email')
+      .normalizeEmail({ gmail_remove_dots: false }),
+   body('password').trim().notEmpty().withMessage('Password is required')
+];
+
+const profileValidation = [
+   body('name').optional().trim().notEmpty().withMessage('Name cannot be empty'),
+   body('bio').optional().isLength({ max: 300 }).withMessage('Bio cannot exceed 300 characters'),
+   body('location').optional().trim(),
+   body('status').optional().trim()
+];
+
+const passwordValidation = [
+   body('currentPassword').notEmpty().withMessage('Current password is required'),
+   body('newPassword')
+      .trim()
+      .isLength({ min: 8 })
+      .withMessage('New password must be at least 8 characters')
+];
+
+router.put('/signup', authLimiter, signupValidation, authControllers.signup);
+router.post('/login', authLimiter, loginValidation, authControllers.login);
+router.get('/profile', isAuth, authControllers.getProfile);
+router.put('/profile', isAuth, profileValidation, authControllers.updateProfile);
+router.put('/password', isAuth, passwordValidation, authControllers.changePassword);
+router.get('/user/:userId', isAuth, authControllers.getPublicProfile);
 
 module.exports = router;

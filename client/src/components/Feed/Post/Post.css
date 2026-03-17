@@ -1,60 +1,60 @@
 .post {
-  width: 100%;
-  padding: 1rem;
-  margin: 1rem 0;
-  border: 1px solid #ccc;
-  border-radius: 12px;
-  background-color: #fff;
-  opacity: 1;
-  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.26);
+   width: 100%;
+   padding: 1rem;
+   margin: 1rem 0;
+   border: 1px solid #ccc;
+   border-radius: 12px;
+   background-color: #fff;
+   opacity: 1;
+   box-shadow: 0 5px 8px rgba(0, 0, 0, 0.26);
 }
 
 .post__meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 1rem;
 }
 
 .post__title {
-  font-size: 1.5rem;
-  margin: 0;
+   font-size: 1.5rem;
+   margin: 0;
 }
 
 .post__image {
-  width: 100%;
-  height: 15rem;
-  margin: 1rem 0;
-  border-radius: 12px;
-  overflow: hidden;
+   width: 100%;
+   height: 15rem;
+   margin: 1rem 0;
+   border-radius: 12px;
+   overflow: hidden;
 }
 
-.post__image img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.post__image img {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
 }
 
 .post__actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 3rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   gap: 3rem;
 }
 
-.post__content{
-  font-size: 1.2rem;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  margin: 1rem 0;
+.post__content {
+   font-size: 1.2rem;
+   overflow: hidden;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   margin: 1rem 0;
 }
 
 @media (min-width: 768px) {
-  .post {
-    padding: 1rem;
-    width: 40rem;
-    margin-left: auto;
-    margin-right: auto;
-  }
+   .post {
+      padding: 1rem;
+      width: 40rem;
+      margin-left: auto;
+      margin-right: auto;
+   }
 }

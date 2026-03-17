@@ -1,193 +1,128 @@
-# 🌍 Tour Vibes
+# Tour Vibes
 
-A modern, full-stack travel journal web application that allows users to share their travel experiences, memories, and adventures with a community of fellow travelers.
+A full-stack travel journal web application built with the MERN stack. Share travel experiences, photos, and adventures with a community of fellow travelers.
 
-## ✨ Features
+## Features
 
-- **User Authentication**: Secure login and signup with JWT token-based authentication
-- **Travel Posts**: Create, edit, and delete travel posts with images and descriptions
-- **Personal Feed**: View your own travel posts in a dedicated personal feed
-- **Community Feed**: Explore travel posts from other users
-- **Image Upload**: Upload and manage travel photos with your posts
-- **Responsive Design**: Mobile-friendly interface that works on all devices
-- **Pagination**: Efficient loading of posts with paginated results
+- **Authentication** -- signup, login, JWT tokens with 1-hour expiry, auto-logout
+- **User Profiles** -- bio, avatar, location, password change
+- **Travel Posts** -- create, edit, delete with image uploads, tags, location, and travel date
+- **Likes and Comments** -- like/unlike posts, comment threads with delete
+- **Community Feed** -- all posts with pagination, sort by newest/oldest/popular, filter by tag
+- **Personal Feed** -- view your own posts
+- **Search** -- full-text search across titles, content, and tags
+- **Rate Limiting** -- auth endpoints rate-limited to prevent brute force
+- **Responsive Design** -- mobile-friendly with hamburger navigation
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-### Frontend
+**Frontend:** React 18, React Router 7, CSS3
+**Backend:** Express 5, Mongoose 9, MongoDB Atlas
+**Auth:** JWT + bcryptjs
+**Uploads:** Multer (local disk, 5MB limit, PNG/JPG only)
+**Tooling:** Prettier, Concurrently, Nodemon, Renovate
 
-- **React 18** - Modern React with hooks and functional components
-- **React Router DOM v6** - Client-side routing
-- **CSS3** - Custom styling with responsive design
-- **JWT** - Token-based authentication
+## Quick Start
 
-### Backend
-
-- **Node.js** - JavaScript runtime
-- **Express.js** - Web application framework
-- **MongoDB** - NoSQL database with Mongoose ODM
-- **JWT** - JSON Web Token for authentication
-- **Multer** - File upload handling
-- **Bcrypt** - Password hashing
-- **Express Validator** - Input validation
-
-## 📁 Project Structure
-
-```text
-tour-vibes/
-├── client/                 # React frontend
-│   ├── public/            # Static files
-│   └── src/
-│       ├── components/    # Reusable React components
-│       ├── pages/        # Page components
-│       └── util/         # Utility functions
-├── server/                # Express backend
-│   ├── controllers/      # Route controllers
-│   ├── models/          # Database models
-│   ├── routes/          # API routes
-│   ├── middleware/      # Custom middleware
-│   └── images/          # Uploaded images storage
-└── README.md
+```bash
+git clone https://github.com/Sagargupta16/tour-vibes.git
+cd tour-vibes
+npm run install:all
 ```
 
-## 🚀 Getting Started
+Create `server/.env` from the example:
 
-### Prerequisites
+```bash
+cp server/.env.example server/.env
+```
 
-- Node.js (v14 or higher)
-- MongoDB Atlas account or local MongoDB installation
-- npm or yarn package manager
+Fill in `MONGODB_URI` and `JWT_SECRET` (required), then:
 
-### Installation
+```bash
+npm run dev
+```
 
-1. **Clone the repository**
+Frontend runs on http://localhost:3000, backend on http://localhost:8000.
 
-   ```bash
-   git clone https://github.com/Sagargupta16/tour-vibes.git
-   cd tour-vibes
-   ```
+## Scripts
 
-2. **Install server dependencies**
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start both servers together (concurrently) |
+| `npm run server` | Backend only |
+| `npm run client` | Frontend only |
+| `npm run build` | Production build of client |
+| `npm run install:all` | Install deps in both server and client |
+| `npm run format` | Format all JS/CSS with Prettier |
+| `npm run format:check` | Check formatting without writing |
 
-   ```bash
-   cd server
-   npm install
-   ```
+## Environment Variables
 
-3. **Install client dependencies**
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `MONGODB_URI` | Yes | `mongodb://localhost:27017/tour-vibes` | MongoDB connection string |
+| `JWT_SECRET` | Yes | -- | Secret for signing JWT tokens |
+| `PORT` | No | `8000` | Server port |
+| `CLIENT_URL` | No | `http://localhost:3000` | Allowed CORS origin |
 
-   ```bash
-   cd ../client
-   npm install
-   ```
+## API Endpoints
 
-4. **Set up environment variables**
-   
-   Create a `.env` file in the server directory:
+### Auth (`/auth`)
 
-   ```env
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret_key
-   PORT=8000
-   ```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `/signup` | Register (rate-limited) |
+| POST | `/login` | Login (rate-limited) |
+| GET | `/profile` | Get own profile |
+| PUT | `/profile` | Update profile (name, bio, location, avatar) |
+| PUT | `/password` | Change password |
+| GET | `/user/:userId` | View public profile |
 
-5. **Start the development servers**
+### Feed (`/feed`)
 
-   **Terminal 1 - Backend:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/posts?page=1&sort=newest&tag=beach` | List posts (paginated, filterable) |
+| GET | `/posts/:userId` | User's posts |
+| POST | `/posts` | Create post (multipart form) |
+| GET | `/post/:postId` | Single post |
+| PUT | `/post/:postId` | Update post |
+| DELETE | `/post/:postId` | Delete post |
+| GET | `/search?q=keyword` | Full-text search |
+| GET | `/tags` | All unique tags |
+| PUT | `/post/:postId/like` | Toggle like |
+| GET | `/post/:postId/comments` | List comments |
+| POST | `/post/:postId/comments` | Add comment |
+| DELETE | `/comment/:commentId` | Delete comment |
 
-   ```bash
-   cd server
-   npm start
-   ```
+## Project Structure
 
-   **Terminal 2 - Frontend:**
+```
+tour-vibes/
+├── client/src/
+│   ├── components/       # Reusable UI components
+│   ├── hooks/            # Custom hooks (useFeed)
+│   ├── pages/            # Route pages (Home, Auth, Feed)
+│   └── util/             # Validators, image helpers
+├── server/
+│   ├── controllers/      # Route handlers (auth, feed, comment)
+│   ├── middleware/        # JWT auth middleware
+│   ├── models/           # Mongoose schemas (User, Post, Comment)
+│   ├── routes/           # Express route definitions
+│   ├── util/             # Shared helpers
+│   └── images/           # Uploaded images (gitignored)
+├── package.json          # Root scripts (dev, format, build)
+├── .prettierrc           # Code formatting config
+└── CLAUDE.md             # AI assistant instructions
+```
 
-   ```bash
-   cd client
-   npm start
-   ```
-
-6. **Access the application**
-
-   - Frontend: <http://localhost:3000>
-   - Backend API: <http://localhost:8000>
-
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-- `POST /auth/signup` - User registration
-- `POST /auth/login` - User login
-
-### Feed Endpoints
-
-- `GET /feed/posts` - Get all posts (paginated)
-- `GET /feed/posts/:userId` - Get user-specific posts
-- `POST /feed/posts` - Create a new post
-- `GET /feed/post/:postId` - Get single post
-- `PUT /feed/post/:postId` - Update a post
-- `DELETE /feed/post/:postId` - Delete a post
-
-## 🔧 Configuration
-
-### Database Setup
-
-The application uses MongoDB Atlas. Update the connection string in `server/app.js` or use environment variables for better security.
-
-### File Storage
-
-Images are stored locally in the `server/images` directory. For production, consider using cloud storage solutions like AWS S3 or Cloudinary.
-
-## 🚀 Deployment
-
-### Frontend Deployment (Netlify/Vercel)
-
-1. Build the React app: `npm run build` in the client directory
-2. Deploy the `build` folder to your hosting platform
-
-### Backend Deployment (Heroku/Railway)
-
-1. Set up environment variables on your hosting platform
-2. Deploy the server directory
-3. Update CORS settings for production
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit changes using conventional commits (`feat:`, `fix:`, `refactor:`)
+4. Push and open a Pull Request
 
-## 📝 License
+## License
 
-This project is licensed under the ISC License.
-
-## 🐛 Known Issues & Future Enhancements
-
-### Current Limitations
-
-- MongoDB credentials are hardcoded (should use environment variables)
-- Image storage is local (consider cloud storage for production)
-- Limited post editing features
-
-### Planned Features
-
-- User profiles with avatars
-- Like and comment system
-- Location tagging with maps integration
-- Search and filter functionality
-- Social features (follow/unfollow users)
-- Dark mode theme
-
-## 📞 Support
-
-If you encounter any issues or have questions, please:
-
-1. Check the existing issues on GitHub
-2. Create a new issue with detailed description
-3. Contact the maintainer
-
----
-
-Happy Traveling! 🗺️✈️
+[MIT](LICENSE)
