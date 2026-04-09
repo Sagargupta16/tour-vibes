@@ -1,5 +1,10 @@
 # Tour Vibes
 
+![GitHub stars](https://img.shields.io/github/stars/Sagargupta16/tour-vibes?style=flat-square)
+![GitHub forks](https://img.shields.io/github/forks/Sagargupta16/tour-vibes?style=flat-square)
+![License](https://img.shields.io/github/license/Sagargupta16/tour-vibes?style=flat-square)
+![Last Commit](https://img.shields.io/github/last-commit/Sagargupta16/tour-vibes?style=flat-square)
+
 A full-stack travel journal web application built with the MERN stack. Share travel experiences, photos, and adventures with a community of fellow travelers.
 
 ## Features
@@ -132,6 +137,15 @@ tour-vibes/
 2. Create a feature branch (`git checkout -b feature/your-feature`)
 3. Commit changes using conventional commits (`feat:`, `fix:`, `refactor:`)
 4. Push and open a Pull Request
+
+## More Projects
+
+| Project | Description |
+|---------|-------------|
+| [claude-cost-optimizer](https://github.com/Sagargupta16/claude-cost-optimizer) | Save 30-60% on Claude Code costs - proven strategies and benchmarks |
+| [Financial Dashboard](https://github.com/Sagargupta16/Financial-Dashboard) | Modern React financial dashboard with analytics and data visualization |
+| [InstagramLikesLeaderboard](https://github.com/Sagargupta16/InstagramLikesLeaderboard) | Browser tool showing who likes your Instagram posts the most |
+| [LeetCode Rating Predictor](https://github.com/Sagargupta16/LeetCode_Rating_Predictor) | Full-stack ML-powered LeetCode contest rating predictor |
 
 ## License
 
