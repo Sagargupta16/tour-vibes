@@ -46,3 +46,7 @@ logs/
 # Temporary files
 .tmp/
 temp/
+
+# Added for consistency
+dist/
+.next/
