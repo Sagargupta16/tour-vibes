@@ -57,12 +57,13 @@ exports.getUserPosts = async (req, res, next) => {
 exports.searchPosts = async (req, res, next) => {
    try {
       const page = parsePage(req.query.page);
-      // Coerce to primitive string to block NoSQL operator injection (e.g. { $regex: ... })
-      const query = typeof req.query.q === 'string' ? req.query.q : String(req.query.q || '');
-      if (!query || !query.trim()) {
+      // Force primitive string; blocks NoSQL operator injection (e.g. { $regex: '.*' })
+      // Use explicit String() — ternary guard is not enough for Sonar taint analysis.
+      const q = String(req.query.q == null ? '' : req.query.q).trim();
+      if (!q) {
          return res.status(200).json({ message: 'No query provided', posts: [], totalItems: 0 });
       }
-      const filter = { $text: { $search: query } };
+      const filter = { $text: { $search: q } };
       const totalItems = await Post.countDocuments(filter);
       const posts = await Post.find(filter, { score: { $meta: 'textScore' } })
          .populate('creator', 'name avatar')
