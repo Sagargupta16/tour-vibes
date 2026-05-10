@@ -40,7 +40,9 @@ exports.login = async (req, res, next) => {
          err.data = errors.array();
          throw err;
       }
-      const { email, password } = req.body;
+      // Coerce to primitive string to block NoSQL operator injection
+      const email = String(req.body.email).toLowerCase();
+      const password = String(req.body.password);
       const user = await User.findOne({ email });
       if (!user) {
          const err = new Error('No user found with this email');

@@ -57,7 +57,8 @@ exports.getUserPosts = async (req, res, next) => {
 exports.searchPosts = async (req, res, next) => {
    try {
       const page = parsePage(req.query.page);
-      const query = req.query.q;
+      // Coerce to primitive string to block NoSQL operator injection (e.g. { $regex: ... })
+      const query = typeof req.query.q === 'string' ? req.query.q : String(req.query.q || '');
       if (!query || !query.trim()) {
          return res.status(200).json({ message: 'No query provided', posts: [], totalItems: 0 });
       }

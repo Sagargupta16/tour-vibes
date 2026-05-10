@@ -18,14 +18,22 @@ const fileStorage = multer.diskStorage({
       cb(null, 'images');
    },
    filename: (req, file, cb) => {
-      cb(null, uuidv4() + '.' + file.mimetype.split('/')[1]);
+      const ext = MIMETYPE_EXTENSIONS[file.mimetype] || 'bin';
+      cb(null, `${uuidv4()}.${ext}`);
    }
 });
 
-const ALLOWED_MIMETYPES = new Set(['image/png', 'image/jpg', 'image/jpeg']);
+// Explicit map from whitelisted MIME types to safe file extensions.
+// Prevents path traversal via crafted mimetype (e.g. "image/../../etc/passwd")
+// being used to build the stored filename.
+const MIMETYPE_EXTENSIONS = Object.freeze({
+   'image/png': 'png',
+   'image/jpg': 'jpg',
+   'image/jpeg': 'jpg'
+});
 
 const fileFilter = (req, file, cb) => {
-   cb(null, ALLOWED_MIMETYPES.has(file.mimetype));
+   cb(null, Object.hasOwn(MIMETYPE_EXTENSIONS, file.mimetype));
 };
 
 app.use(bodyParser.json());
