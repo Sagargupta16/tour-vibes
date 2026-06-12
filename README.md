@@ -1,9 +1,9 @@
 # Tour Vibes
 
-![GitHub stars](https://img.shields.io/github/stars/Sagargupta16/tour-vibes?style=flat-square)
-![GitHub forks](https://img.shields.io/github/forks/Sagargupta16/tour-vibes?style=flat-square)
-![License](https://img.shields.io/github/license/Sagargupta16/tour-vibes?style=flat-square)
-![Last Commit](https://img.shields.io/github/last-commit/Sagargupta16/tour-vibes?style=flat-square)
+![GitHub stars](https://img.shields.io/github/stars/Sagargupta16/tour-vibes?style=flat-square&cacheSeconds=86400)
+![GitHub forks](https://img.shields.io/github/forks/Sagargupta16/tour-vibes?style=flat-square&cacheSeconds=86400)
+![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+![Last Commit](https://img.shields.io/github/last-commit/Sagargupta16/tour-vibes?style=flat-square&cacheSeconds=86400)
 
 A full-stack travel journal web application built with the MERN stack. Share travel experiences, photos, and adventures with a community of fellow travelers.
 
