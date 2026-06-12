@@ -13,7 +13,7 @@
     "format:check": "prettier --check \"client/src/**/*.{js,jsx,css}\" \"server/**/*.js\" --ignore-path .prettierignore"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2",
+    "concurrently": "^10.0.3",
     "prettier": "^3.8.1"
   }
 }
