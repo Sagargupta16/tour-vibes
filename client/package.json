@@ -37,5 +37,8 @@
     "globals": "^17.4.0",
     "tailwindcss": "^4.2.1",
     "vite": "^7.3.3"
+  },
+  "overrides": {
+    "esbuild": ">=0.28.1"
   }
 }
