@@ -3,28 +3,43 @@ const { validationResult } = require('express-validator');
 
 const Post = require('../models/post');
 const User = require('../models/users');
+const Comment = require('../models/comment');
 const {
    PER_PAGE,
    parsePage,
    normalizePath,
    clearImage,
-   getSortOption
+   getSortOption,
+   parseTags
 } = require('../util/helpers');
 
 exports.getPosts = async (req, res, next) => {
    try {
       const page = parsePage(req.query.page);
-      const sort = getSortOption(req.query.sort);
       const filter = {};
       if (req.query.tag) {
          filter.tags = req.query.tag.toLowerCase();
       }
       const totalItems = await Post.countDocuments(filter);
-      const posts = await Post.find(filter)
-         .populate('creator', 'name avatar')
-         .sort(sort)
-         .skip((page - 1) * PER_PAGE)
-         .limit(PER_PAGE);
+      let posts;
+      if (req.query.sort === 'popular') {
+         // likesCount is not a stored field, so a plain .sort() on it is a no-op.
+         // Compute it from the likes array via aggregation to sort by popularity.
+         posts = await Post.aggregate([
+            { $match: filter },
+            { $addFields: { likesCount: { $size: '$likes' } } },
+            { $sort: { likesCount: -1, createdAt: -1 } },
+            { $skip: (page - 1) * PER_PAGE },
+            { $limit: PER_PAGE }
+         ]);
+         posts = await Post.populate(posts, { path: 'creator', select: 'name avatar' });
+      } else {
+         posts = await Post.find(filter)
+            .populate('creator', 'name avatar')
+            .sort(getSortOption(req.query.sort))
+            .skip((page - 1) * PER_PAGE)
+            .limit(PER_PAGE);
+      }
       res.status(200).json({ message: 'Fetched successfully', posts, totalItems });
    } catch (err) {
       if (!err.statusCode) err.statusCode = 500;
@@ -98,7 +113,7 @@ exports.createPost = async (req, res, next) => {
          imageUrl,
          creator: req.userId
       };
-      if (req.body.tags) postData.tags = JSON.parse(req.body.tags);
+      if (req.body.tags) postData.tags = parseTags(req.body.tags);
       if (req.body.locationName || req.body.locationCountry) {
          postData.location = {
             name: req.body.locationName || '',
@@ -163,7 +178,7 @@ exports.updatePost = async (req, res, next) => {
       post.title = req.body.title;
       post.content = req.body.content;
       post.imageUrl = imageUrl;
-      if (req.body.tags) post.tags = JSON.parse(req.body.tags);
+      if (req.body.tags) post.tags = parseTags(req.body.tags);
       if (req.body.locationName !== undefined || req.body.locationCountry !== undefined) {
          post.location = {
             name: req.body.locationName || post.location.name,
@@ -195,6 +210,7 @@ exports.deletePost = async (req, res, next) => {
       }
       clearImage(post.imageUrl);
       await Post.findByIdAndDelete(req.params.postId);
+      await Comment.deleteMany({ post: post._id });
       await User.findByIdAndUpdate(req.userId, { $pull: { posts: post._id } });
       res.status(200).json({ message: 'Post deleted successfully' });
    } catch (err) {
