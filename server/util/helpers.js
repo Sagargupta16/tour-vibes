@@ -33,4 +33,23 @@ const getSortOption = (sort) => {
    }
 };
 
-module.exports = { PER_PAGE, parsePage, normalizePath, clearImage, getSortOption };
+// Tags arrive as a JSON-stringified array in a multipart field. Untrusted input:
+// bad JSON or a non-array must surface as a 422, not an uncaught 500 from JSON.parse.
+const parseTags = (raw) => {
+   let parsed;
+   try {
+      parsed = JSON.parse(raw);
+   } catch {
+      const error = new Error('Tags must be a valid JSON array');
+      error.statusCode = 422;
+      throw error;
+   }
+   if (!Array.isArray(parsed)) {
+      const error = new Error('Tags must be a valid JSON array');
+      error.statusCode = 422;
+      throw error;
+   }
+   return parsed;
+};
+
+module.exports = { PER_PAGE, parsePage, normalizePath, clearImage, getSortOption, parseTags };

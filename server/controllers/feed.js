@@ -9,7 +9,8 @@ const {
    parsePage,
    normalizePath,
    clearImage,
-   getSortOption
+   getSortOption,
+   parseTags
 } = require('../util/helpers');
 
 exports.getPosts = async (req, res, next) => {
@@ -112,7 +113,7 @@ exports.createPost = async (req, res, next) => {
          imageUrl,
          creator: req.userId
       };
-      if (req.body.tags) postData.tags = JSON.parse(req.body.tags);
+      if (req.body.tags) postData.tags = parseTags(req.body.tags);
       if (req.body.locationName || req.body.locationCountry) {
          postData.location = {
             name: req.body.locationName || '',
@@ -177,7 +178,7 @@ exports.updatePost = async (req, res, next) => {
       post.title = req.body.title;
       post.content = req.body.content;
       post.imageUrl = imageUrl;
-      if (req.body.tags) post.tags = JSON.parse(req.body.tags);
+      if (req.body.tags) post.tags = parseTags(req.body.tags);
       if (req.body.locationName !== undefined || req.body.locationCountry !== undefined) {
          post.location = {
             name: req.body.locationName || post.location.name,
