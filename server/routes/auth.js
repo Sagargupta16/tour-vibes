@@ -19,7 +19,10 @@ const signupValidation = [
       .isEmail()
       .withMessage('Enter a valid email')
       .custom(async (value) => {
-         const user = await User.findOne({ email: value });
+         // Coerce to primitive string to block NoSQL operator injection
+         // (e.g. { $ne: null }); .isEmail() failing does not stop this custom
+         // validator from running with the raw object value.
+         const user = await User.findOne({ email: String(value) });
          if (user) {
             throw new Error('Email already registered');
          }
