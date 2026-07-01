@@ -22,12 +22,12 @@ const clearImage = (filePath) => {
    });
 };
 
+// Popularity sorting is handled separately in getPosts via aggregation
+// ($size of likes), since likesCount is not a stored field.
 const getSortOption = (sort) => {
    switch (sort) {
       case 'oldest':
          return { createdAt: 1 };
-      case 'popular':
-         return { likesCount: -1, createdAt: -1 };
       default:
          return { createdAt: -1 };
    }

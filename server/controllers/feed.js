@@ -14,17 +14,30 @@ const {
 exports.getPosts = async (req, res, next) => {
    try {
       const page = parsePage(req.query.page);
-      const sort = getSortOption(req.query.sort);
       const filter = {};
       if (req.query.tag) {
          filter.tags = req.query.tag.toLowerCase();
       }
       const totalItems = await Post.countDocuments(filter);
-      const posts = await Post.find(filter)
-         .populate('creator', 'name avatar')
-         .sort(sort)
-         .skip((page - 1) * PER_PAGE)
-         .limit(PER_PAGE);
+      let posts;
+      if (req.query.sort === 'popular') {
+         // likesCount is not a stored field, so a plain .sort() on it is a no-op.
+         // Compute it from the likes array via aggregation to sort by popularity.
+         posts = await Post.aggregate([
+            { $match: filter },
+            { $addFields: { likesCount: { $size: '$likes' } } },
+            { $sort: { likesCount: -1, createdAt: -1 } },
+            { $skip: (page - 1) * PER_PAGE },
+            { $limit: PER_PAGE }
+         ]);
+         posts = await Post.populate(posts, { path: 'creator', select: 'name avatar' });
+      } else {
+         posts = await Post.find(filter)
+            .populate('creator', 'name avatar')
+            .sort(getSortOption(req.query.sort))
+            .skip((page - 1) * PER_PAGE)
+            .limit(PER_PAGE);
+      }
       res.status(200).json({ message: 'Fetched successfully', posts, totalItems });
    } catch (err) {
       if (!err.statusCode) err.statusCode = 500;
