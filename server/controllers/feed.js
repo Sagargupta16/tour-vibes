@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 
 const Post = require('../models/post');
 const User = require('../models/users');
+const Comment = require('../models/comment');
 const {
    PER_PAGE,
    parsePage,
@@ -208,6 +209,7 @@ exports.deletePost = async (req, res, next) => {
       }
       clearImage(post.imageUrl);
       await Post.findByIdAndDelete(req.params.postId);
+      await Comment.deleteMany({ post: post._id });
       await User.findByIdAndUpdate(req.userId, { $pull: { posts: post._id } });
       res.status(200).json({ message: 'Post deleted successfully' });
    } catch (err) {
