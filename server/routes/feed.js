@@ -1,11 +1,20 @@
 const express = require('express');
 const { body } = require('express-validator');
+const rateLimit = require('express-rate-limit');
 
 const feedControllers = require('../controllers/feed');
 const commentControllers = require('../controllers/comment');
 const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
+
+const apiLimiter = rateLimit({
+   windowMs: 15 * 60 * 1000,
+   max: 300,
+   message: { message: 'Too many requests, please try again later' }
+});
+
+router.use(apiLimiter);
 
 const postValidation = [
    body('title').trim().isLength({ min: 5 }).withMessage('Title must be at least 5 characters'),
