@@ -7,6 +7,8 @@
 
 A full-stack travel journal web application built with the MERN stack. Share travel experiences, photos, and adventures with a community of fellow travelers.
 
+> Note: This is a sample/reference project -- it is not actively deployed.
+
 ## Features
 
 - **Authentication** -- signup, login, JWT tokens with 1-hour expiry, auto-logout
@@ -25,7 +27,7 @@ A full-stack travel journal web application built with the MERN stack. Share tra
 
 ## Tech Stack
 
-**Frontend:** Vite 7, React 19, Tailwind CSS 4, shadcn/ui, Framer Motion, Sonner
+**Frontend:** Vite 8, React 19, Tailwind CSS 4, shadcn/ui, Framer Motion, Sonner
 **Backend:** Express 5, Mongoose 9, MongoDB Atlas
 **Auth:** JWT + bcryptjs
 **Uploads:** Multer (local disk, 5MB limit, PNG/JPG only)
