@@ -1,5 +1,5 @@
 {
-  "author": "",
+  "author": "Sagar Gupta",
   "dependencies": {
     "bcryptjs": "^3.0.0",
     "body-parser": "^2.0.0",
@@ -13,13 +13,13 @@
     "multer": "^2.1.1",
     "uuid": "^14.0.0"
   },
-  "description": "",
+  "description": "Express REST API for the Tour Vibes travel journal",
   "devDependencies": {
     "nodemon": "^3.0.0"
   },
-  "license": "ISC",
+  "license": "MIT",
   "main": "index.js",
-  "name": "restapi",
+  "name": "tour-vibes-server",
   "scripts": {
     "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
