@@ -14,8 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Rules
 
 - **Every file must stay under 250 lines.** If a file approaches this limit, split it into smaller, focused modules.
-- **Always use latest stable versions** of dependencies, APIs, and language features. No deprecated patterns.
-- **Follow current best practices** -- functional components with hooks (no class components), async/await (no .then chains), ES module-style imports where possible, proper error handling.
+- Functional components with hooks (no class components), async/await (no .then chains), ES module-style imports where possible.
 - 3-space indentation (`.editorconfig` + `.prettierrc`).
 - Conventional commits: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`.
 
