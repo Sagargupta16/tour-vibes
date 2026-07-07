@@ -97,7 +97,7 @@ Vite + React 19 + Tailwind CSS 4 + shadcn/ui. Minimalist/clean design with dark 
 - API base URL from `VITE_API_URL` env var (no hardcoded URLs)
 - Auth via `useAuth()` context hook (no prop drilling)
 - Dark/light mode via `useTheme()` with localStorage persistence
-- Feed state in URL search params (shareable/bookmarkable)
+- Feed state (search, tag, sort, page) in local React state via `useState` (not URL params)
 - Toast notifications (sonner) on all user actions
 - Framer Motion page transitions and hover effects
 
