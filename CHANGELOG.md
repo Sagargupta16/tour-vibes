@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.6.2 - 2026-09-03
+
+### Fixed
+- Resolve 4 new Dependabot security alerts
+- Client: `browserslist` bumped to 4.28.8 (high, #294), `@humanfs/node` to 0.16.8 (#296)
+- Server: override `qs` >=6.16.0, resolves to 6.16.0 (#297, #298)
+
 ## v0.6.1 - 2026-09-03
 
 ### Fixed

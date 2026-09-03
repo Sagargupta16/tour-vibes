@@ -22,11 +22,12 @@
   "name": "tour-vibes-server",
   "overrides": {
     "ip-address": "10.3.1",
-    "brace-expansion@5": "5.0.7"
+    "brace-expansion@5": "5.0.7",
+    "qs": ">=6.16.0"
   },
   "scripts": {
     "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.1"
+  "version": "1.0.2"
 }
