@@ -2,14 +2,14 @@
   "author": "Sagar Gupta",
   "dependencies": {
     "bcryptjs": "^3.0.0",
-    "body-parser": "^2.0.0",
+    "body-parser": "^2.3.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.0.0",
     "express-rate-limit": "^8.5.1",
     "express-validator": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^9.0.0",
+    "mongoose": "^9.7.2",
     "multer": "^2.1.1",
     "uuid": "^14.0.0"
   },
@@ -20,9 +20,13 @@
   "license": "MIT",
   "main": "index.js",
   "name": "tour-vibes-server",
+  "overrides": {
+    "ip-address": "10.3.1",
+    "brace-expansion@5": "5.0.7"
+  },
   "scripts": {
     "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
