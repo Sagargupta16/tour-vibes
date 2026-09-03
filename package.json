@@ -1,6 +1,6 @@
 {
   "name": "tour-vibes",
-  "version": "0.5.0",
+  "version": "0.6.1",
   "private": true,
   "description": "A full-stack MERN travel journal web application",
   "scripts": {
@@ -15,5 +15,8 @@
   "devDependencies": {
     "concurrently": "^10.0.3",
     "prettier": "^3.8.1"
+  },
+  "overrides": {
+    "shell-quote": "1.9.0"
   }
 }

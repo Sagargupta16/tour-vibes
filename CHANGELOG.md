@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.6.1 - 2026-09-03
+
+### Fixed
+- Resolve 19 open Dependabot security alerts across root, client, and server
+- Client: `react-router-dom` bumped to v7.18.2+ (react-router CVEs), overrides for `js-yaml` 4.3.1, `postcss` 8.5.23, `brace-expansion` 1.1.16, `@babel/core` 7.29.6
+- Server: `mongoose` bumped to v9.7.2+, `body-parser` to v2.3.0+, overrides for `ip-address` 10.3.1 and `brace-expansion` 5.0.7
+- Root: override for `shell-quote` 1.9.0
+
 ## v0.6.0 - 2026-03-17
 
 ### Added
