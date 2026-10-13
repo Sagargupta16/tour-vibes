@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.6.3 - 2026-10-13
+
+### Fixed
+- Resolve 5 Dependabot alerts: proxy-addr 2.0.8 (critical IP spoofing, server), brace-expansion 5.0.12 (server) and 1.1.21 (client), source-map-js 1.2.2 and js-yaml 4.3.2 (client), via the existing overrides
+- Client lockfile resolves again: @vitejs/plugin-react 4.7 did not accept vite 8, so `npm ci` failed; bumped to 5.2.0 with @tailwindcss/vite and tailwindcss 4.3.3
+
 ## v0.6.2 - 2026-09-03
 
 ### Fixed
