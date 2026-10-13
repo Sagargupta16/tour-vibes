@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.6.4 - 2026-10-13
+
+### Fixed
+- Bump the root shell-quote override from 1.9.0 to 1.11.0 for a critical Dependabot alert (#314) raised by the rescan after v0.6.3; the root lockfile version now matches package.json
+
 ## v0.6.3 - 2026-10-13
 
 ### Fixed
