@@ -17,6 +17,6 @@
     "prettier": "^3.8.1"
   },
   "overrides": {
-    "shell-quote": "1.9.0"
+    "shell-quote": "1.11.0"
   }
 }
