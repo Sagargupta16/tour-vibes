@@ -1,0 +1,29 @@
+name: CI
+on:
+   push:
+      branches: [main]
+   pull_request:
+permissions:
+   contents: read
+jobs:
+   client:
+      uses: Sagargupta16/shared-workflows/.github/workflows/node-ci.yml@main
+      with:
+         working-directory: client
+         run-tests: false
+   server:
+      uses: Sagargupta16/shared-workflows/.github/workflows/node-ci.yml@main
+      with:
+         working-directory: server
+         run-tests: false
+   format:
+      name: Prettier
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v6
+         - uses: actions/setup-node@v6
+           with:
+              node-version-file: .nvmrc
+              cache: npm
+         - run: npm ci
+         - run: npm run format:check

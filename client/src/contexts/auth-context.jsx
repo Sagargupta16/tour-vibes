@@ -1,4 +1,12 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import {
+   createContext,
+   useContext,
+   useState,
+   useEffect,
+   useCallback,
+   useRef,
+   useMemo
+} from 'react';
 import { api } from '@/lib/api';
 
 const AuthContext = createContext();

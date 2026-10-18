@@ -31,10 +31,7 @@ export function ThemeProvider({ children }) {
       return () => mq.removeEventListener('change', applyTheme);
    }, [theme]);
 
-   const value = useMemo(
-      () => ({ theme, setTheme, resolvedTheme: resolveTheme(theme) }),
-      [theme]
-   );
+   const value = useMemo(() => ({ theme, setTheme, resolvedTheme: resolveTheme(theme) }), [theme]);
 
    return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

@@ -8,10 +8,23 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/auth-context';
 import CommentForm from './comment-form';
 
+function timeAgo(date, now) {
+   const seconds = Math.floor((now - new Date(date).getTime()) / 1000);
+   if (seconds < 60) return 'just now';
+   const minutes = Math.floor(seconds / 60);
+   if (minutes < 60) return `${minutes}m ago`;
+   const hours = Math.floor(minutes / 60);
+   if (hours < 24) return `${hours}h ago`;
+   const days = Math.floor(hours / 24);
+   return `${days}d ago`;
+}
+
 export default function CommentList({ postId }) {
    const { userId } = useAuth();
    const [comments, setComments] = useState([]);
    const [loading, setLoading] = useState(true);
+   // Read the clock once per mount: Date.now() in render is impure
+   const [now] = useState(Date.now);
 
    useEffect(() => {
       api.get(`/feed/post/${postId}/comments`)
@@ -34,25 +47,12 @@ export default function CommentList({ postId }) {
       setComments((prev) => [comment, ...prev]);
    };
 
-   const timeAgo = (date) => {
-      const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-      if (seconds < 60) return 'just now';
-      const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `${minutes}m ago`;
-      const hours = Math.floor(minutes / 60);
-      if (hours < 24) return `${hours}h ago`;
-      const days = Math.floor(hours / 24);
-      return `${days}d ago`;
-   };
-
    return (
       <div className="space-y-4">
          <h3 className="text-lg font-semibold">Comments ({comments.length})</h3>
          <CommentForm postId={postId} onCommentAdded={handleAdd} />
          <Separator />
-         {loading && (
-            <p className="text-sm text-muted-foreground">Loading comments...</p>
-         )}
+         {loading && <p className="text-sm text-muted-foreground">Loading comments...</p>}
          {!loading && comments.length === 0 && (
             <p className="text-sm text-muted-foreground">No comments yet. Be the first!</p>
          )}
@@ -69,7 +69,7 @@ export default function CommentList({ postId }) {
                         <div className="flex items-center gap-2">
                            <span className="text-sm font-medium">{c.author?.name}</span>
                            <span className="text-xs text-muted-foreground">
-                              {timeAgo(c.createdAt)}
+                              {timeAgo(c.createdAt, now)}
                            </span>
                         </div>
                         <p className="mt-0.5 text-sm">{c.text}</p>
