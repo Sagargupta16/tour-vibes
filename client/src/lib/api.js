@@ -19,7 +19,9 @@ async function request(path, options = {}) {
 
    const res = await fetch(`${API_URL}${path}`, { ...options, headers });
 
-   if (res.status === 401) {
+   // Only a request that carried a token can have an expired session; a failed
+   // login is also a 401 and must surface the server's message instead.
+   if (res.status === 401 && token) {
       localStorage.removeItem('token');
       localStorage.removeItem('expiryDate');
       localStorage.removeItem('userId');

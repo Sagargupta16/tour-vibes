@@ -58,7 +58,7 @@ export default function ProfileForm({ user, onUpdate }) {
                <Input
                   id="avatar"
                   type="file"
-                  accept="image/*"
+                  accept="image/png,image/jpeg"
                   onChange={handleAvatar}
                   className="mt-1"
                />

@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/users');
+const { normalizePath, clearImage } = require('../util/helpers');
 
 exports.signup = async (req, res, next) => {
    try {
@@ -44,14 +45,10 @@ exports.login = async (req, res, next) => {
       const email = String(req.body.email).toLowerCase();
       const password = String(req.body.password);
       const user = await User.findOne({ email });
-      if (!user) {
-         const err = new Error('No user found with this email');
-         err.statusCode = 401;
-         throw err;
-      }
-      const matched = await bcrypt.compare(password, user.password);
+      // One message for both cases so the endpoint does not reveal which emails exist
+      const matched = user ? await bcrypt.compare(password, user.password) : false;
       if (!matched) {
-         const err = new Error('Incorrect password');
+         const err = new Error('Invalid email or password');
          err.statusCode = 401;
          throw err;
       }
@@ -103,7 +100,8 @@ exports.updateProfile = async (req, res, next) => {
       if (location !== undefined) user.location = location;
       if (status !== undefined) user.status = status;
       if (req.file) {
-         user.avatar = req.file.path.replace(/\\/g, '/');
+         clearImage(user.avatar);
+         user.avatar = normalizePath(req.file.path);
       }
       await user.save();
       const { password, ...profile } = user.toObject();
@@ -132,8 +130,9 @@ exports.changePassword = async (req, res, next) => {
       const { currentPassword, newPassword } = req.body;
       const matched = await bcrypt.compare(currentPassword, user.password);
       if (!matched) {
+         // 422, not 401: the session is valid, and the client treats 401 as expired
          const err = new Error('Current password is incorrect');
-         err.statusCode = 401;
+         err.statusCode = 422;
          throw err;
       }
       user.password = await bcrypt.hash(newPassword, 12);
