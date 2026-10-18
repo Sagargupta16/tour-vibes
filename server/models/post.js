@@ -28,7 +28,10 @@ const postSchema = new mongoose.Schema(
       ],
       location: {
          name: { type: String, default: '' },
-         country: { type: String, default: '' }
+         country: { type: String, default: '' },
+         // Optional map pin, set by clicking the map in the post form
+         lat: { type: Number, min: -90, max: 90 },
+         lng: { type: Number, min: -180, max: 180 }
       },
       travelDate: {
          type: Date
@@ -46,5 +49,7 @@ const postSchema = new mongoose.Schema(
 );
 
 postSchema.index({ title: 'text', content: 'text', tags: 'text' });
+// Serves the map view's bounding-box query (GET /feed/map?bbox=...)
+postSchema.index({ 'location.lat': 1, 'location.lng': 1 });
 
 module.exports = mongoose.model('Post', postSchema);

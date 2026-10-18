@@ -35,20 +35,25 @@ app.use((error, req, res, next) => {
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/tour-vibes';
 const PORT = process.env.PORT || 8000;
 
-if (!process.env.JWT_SECRET) {
-   console.error('FATAL: JWT_SECRET environment variable is not set');
-   process.exit(1);
-}
-
-mongoose
-   .connect(MONGODB_URI)
-   .then(() => {
+const start = async () => {
+   if (!process.env.JWT_SECRET) {
+      console.error('FATAL: JWT_SECRET environment variable is not set');
+      process.exit(1);
+   }
+   try {
+      await mongoose.connect(MONGODB_URI);
       console.log('Connected to MongoDB');
       app.listen(PORT, () => {
          console.log(`Server is running on port ${PORT}`);
       });
-   })
-   .catch((err) => {
+   } catch (err) {
       console.error('Database connection failed:', err);
       process.exit(1);
-   });
+   }
+};
+
+// `node app.js` starts the server; the tests require the app without listening
+// start() handles its own errors, so the promise is deliberately not awaited
+if (require.main === module) void start();
+
+module.exports = app;
