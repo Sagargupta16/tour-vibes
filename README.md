@@ -104,7 +104,7 @@ docker compose up --build
 docker compose run --rm api npm run seed   # optional: demo journals
 ```
 
-Open http://localhost:3000 and use **Try the demo account** on the login page. It calls `POST /auth/demo`, which signs in as `demo@demo.tourvibes.dev` because compose sets `DEMO_EMAIL` on the API, so no demo password is stored anywhere. To sign in through the form instead, seed with your own password (`docker compose run --rm -e DEMO_PASSWORD=... api npm run seed`); without it the seed generates one and prints it once. Compose starts MongoDB 8, the API on port 8000 and the built client behind nginx on port 3000, with uploads and data in named volumes. It falls back to a local-only `JWT_SECRET`; set your own (`JWT_SECRET=... docker compose up`) before exposing it anywhere.
+Open http://localhost:3000 and use **Try the demo account** on the login page. It calls `POST /auth/demo`, which signs in as `demo@demo.tourvibes.dev` because compose sets `DEMO_EMAIL` on the API, so no demo password is stored anywhere. To sign in through the form instead, seed with your own password (`docker compose run --rm -e DEMO_PASSWORD=... api npm run seed`); without it the demo users get a random password that is never logged. Compose starts MongoDB 8, the API on port 8000 and the built client behind nginx on port 3000, with uploads and data in named volumes. It falls back to a local-only `JWT_SECRET`; set your own (`JWT_SECRET=... docker compose up`) before exposing it anywhere.
 
 ### Without Docker
 
@@ -155,7 +155,7 @@ In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journ
 | `VITE_API_URL`    | No (client) | `http://localhost:8000`                | API base URL baked into the client build            |
 | `DEMO_EMAIL`      | No          | --                                     | Seeded demo account `POST /auth/demo` signs in as   |
 | `VITE_DEMO_LOGIN` | No (client) | --                                     | `true`: the login page shows a one-click demo login |
-| `DEMO_PASSWORD`   | No (seed)   | random, printed once                   | Password for the demo users `npm run seed` creates  |
+| `DEMO_PASSWORD`   | No (seed)   | random, never logged                   | Password for the demo users `npm run seed` creates  |
 
 ## API Endpoints
 

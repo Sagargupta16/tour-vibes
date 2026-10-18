@@ -58,7 +58,7 @@ docker compose run --rm api npm run seed
 - `PORT` -- defaults to 8000
 - `CLIENT_URL` -- defaults to `http://localhost:3000` (used for CORS)
 - `DEMO_EMAIL` -- optional, the seeded account `POST /auth/demo` signs in as
-- `DEMO_PASSWORD` -- optional, read by `npm run seed` for the demo users; unset, the seed generates one and prints it once
+- `DEMO_PASSWORD` -- optional, read by `npm run seed` for the demo users; unset, the seed uses a random one and never logs it
 
 **Client:** Copy `client/.env.example` to `client/.env`:
 - `VITE_API_URL` -- defaults to `http://localhost:8000`

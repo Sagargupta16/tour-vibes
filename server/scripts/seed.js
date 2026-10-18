@@ -3,11 +3,11 @@
 // only removes users on the demo email domain, their posts and comments, and
 // the seed-* images.
 //
-//   npm run seed                      (random demo password, printed once)
+//   npm run seed                      (random demo password, never logged)
 //   DEMO_PASSWORD=... npm run seed    (choose it, to sign in through the login form)
 //
 // The one-click demo login (POST /auth/demo, enabled by DEMO_EMAIL on the API)
-// needs no password, so none is committed to the repo.
+// needs no password, so none is committed to the repo or written to the log.
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -122,7 +122,9 @@ const seed = async () => {
    );
    console.log(`Demo account: ${emailFor('demo')} (set DEMO_EMAIL to it for the demo login)`);
    if (!process.env.DEMO_PASSWORD) {
-      console.log(`Generated demo password (set DEMO_PASSWORD to choose one): ${password}`);
+      console.log(
+         'Demo users got a random password; re-run with DEMO_PASSWORD set to sign in with one'
+      );
    }
 };
 
