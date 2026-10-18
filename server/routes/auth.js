@@ -6,8 +6,10 @@ const authControllers = require('../controllers/auth');
 const User = require('../models/users');
 const isAuth = require('../middleware/is-auth');
 const upload = require('../middleware/upload');
+const validId = require('../middleware/valid-id');
 
 const router = express.Router();
+router.param('userId', validId);
 
 const authLimiter = rateLimit({
    windowMs: 15 * 60 * 1000,
@@ -67,6 +69,7 @@ const passwordValidation = [
 
 router.put('/signup', authLimiter, signupValidation, authControllers.signup);
 router.post('/login', authLimiter, loginValidation, authControllers.login);
+router.post('/demo', authLimiter, authControllers.demoLogin);
 router.get('/profile', profileLimiter, isAuth, authControllers.getProfile);
 router.put(
    '/profile',

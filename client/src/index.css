@@ -82,3 +82,56 @@ body {
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
 }
+
+/* Leaflet maps (map page, post form picker, single journal) */
+.tv-map {
+   background: var(--muted);
+   font-family: var(--font-sans);
+}
+
+/* Leaflet positions the icon element with its own transform, so the hover lift
+   goes on the inner svg */
+.tv-pin {
+   color: oklch(0.62 0.21 30);
+   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.35));
+}
+
+.tv-pin svg {
+   transform-origin: 50% 100%;
+   transition: transform 150ms ease-out;
+}
+
+.tv-pin:hover svg {
+   transform: translateY(-3px) scale(1.12);
+}
+
+.tv-map .leaflet-popup-content-wrapper,
+.tv-map .leaflet-popup-tip {
+   background: var(--popover);
+   color: var(--popover-foreground);
+}
+
+.tv-map .leaflet-popup-content {
+   margin: 10px;
+}
+
+/* Leaflet colours every link blue; the popup card keeps the theme text colour */
+.tv-map .leaflet-popup-content a {
+   color: inherit;
+}
+
+/* OSM has no dark tiles; invert the light ones and rotate hue back */
+.dark .tv-map .leaflet-tile-pane {
+   filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+
+.dark .tv-map .leaflet-bar a,
+.dark .tv-map .leaflet-control-attribution {
+   background: var(--card);
+   color: var(--card-foreground);
+   border-color: var(--border);
+}
+
+.dark .tv-map .leaflet-control-attribution a {
+   color: var(--muted-foreground);
+}

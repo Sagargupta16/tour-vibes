@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.8.0 - 2026-10-18
+
+### Added
+
+- Journal map at `/map`: every pinned journal on OpenStreetMap tiles with a photo popup per marker. Panning or zooming reloads only the pins inside the visible box, and each reload aborts the previous one
+- Map pin picker in the post form: tap the map, drag the pin, or look the city and country up through Nominatim. A pinned journal shows its own map under the text
+- `GET /feed/map?bbox=west,south,east,north` returns up to 500 pinned posts in the box, including boxes that cross the antimeridian. Posts take optional `lat` and `lng` fields, range-checked and required together
+- API test suite: 32 `node:test` cases through supertest against an in-memory MongoDB, covering each v0.7.0 security fix, the feed, comments, likes and the map query. CI now runs them
+- `npm run seed` (server) loads 5 demo users and 19 pinned journals with photos, likes and comments; re-running it only replaces the demo users and their data. Photos are Unsplash images credited in `server/seed/photos/CREDITS.md`
+- Optional one-click demo login: `POST /auth/demo` signs in as the `DEMO_EMAIL` account, and the login page shows the button when built with `VITE_DEMO_LOGIN=true`. No demo password is committed or baked into the client; `npm run seed` uses `DEMO_PASSWORD` for the demo users, or a random one it never logs
+- `docker-compose.yml` with MongoDB 8, the API and the client behind unprivileged nginx (port 8080 in the container): `docker compose up --build` runs the whole stack. CI gets a Docker smoke test that seeds the stack with a per-run random `DEMO_PASSWORD` and logs in as the demo user through `/auth/demo` and `/auth/login`
+- `npm run bundle:report` (client) prints every JS chunk with raw and gzip size
+- README screenshots (desktop and phone), testing and bundle size sections
+
+### Changed
+
+- Every page except Home is lazy-loaded, and React, Framer Motion and Leaflet build into their own chunks. JS loaded on first paint went from 673.12 kB to 596.27 kB raw (210.59 kB to 191.54 kB gzip) while adding the map, and the build no longer warns about chunks over 500 kB
+- `toggleLike` moved to `controllers/like.js`, which brings `controllers/feed.js` back under the 250-line limit
+- `server/app.js` exports the app and only connects and listens when run directly, so the tests can load it
+
+### Fixed
+
+- A malformed `:postId`, `:commentId` or `:userId` returned a 500 with the Mongoose CastError; it is now a 400 for every route
+- Reloading or opening a link to a signed-in page (a journal, the map, the profile) bounced to `/journals`, because the stored session was restored after the first render
+- A slow response for an earlier search or page could replace the results of a newer one in the feed; the older request is now aborted
+
 ## v0.7.0 - 2026-10-18
 
 ### Security

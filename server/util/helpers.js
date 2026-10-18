@@ -52,4 +52,27 @@ const parseTags = (raw) => {
    return parsed;
 };
 
-module.exports = { PER_PAGE, parsePage, normalizePath, clearImage, getSortOption, parseTags };
+// Map pin from the multipart lat/lng fields (range-checked by express-validator).
+// Returns undefined when neither field was sent, null when both are empty (pin
+// removed), and { lat, lng } otherwise. One without the other is a 422.
+const parseCoordinates = (body) => {
+   const { lat, lng } = body;
+   if (lat === undefined && lng === undefined) return undefined;
+   if (!lat && !lng) return null;
+   if (!lat || !lng) {
+      const error = new Error('Latitude and longitude must be sent together');
+      error.statusCode = 422;
+      throw error;
+   }
+   return { lat: Number(lat), lng: Number(lng) };
+};
+
+module.exports = {
+   PER_PAGE,
+   parsePage,
+   normalizePath,
+   clearImage,
+   getSortOption,
+   parseTags,
+   parseCoordinates
+};

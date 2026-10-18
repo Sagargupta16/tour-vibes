@@ -52,17 +52,39 @@ exports.login = async (req, res, next) => {
          err.statusCode = 401;
          throw err;
       }
-      const token = jwt.sign(
-         { email: user.email, userId: user._id.toString() },
-         process.env.JWT_SECRET,
-         { expiresIn: '1h' }
-      );
-      res.status(200).json({ token, name: user.name, userId: user._id.toString() });
+      sendSession(res, user);
    } catch (err) {
       if (!err.statusCode) err.statusCode = 500;
       next(err);
    }
 };
+
+// One-click demo login: signs in as the DEMO_EMAIL account (a demo user from
+// `npm run seed`) without a password, so no demo password ships in the client
+// bundle or the repo. Off unless DEMO_EMAIL is set.
+exports.demoLogin = async (req, res, next) => {
+   try {
+      const email = process.env.DEMO_EMAIL?.toLowerCase();
+      const user = email ? await User.findOne({ email }) : null;
+      if (!user) {
+         const err = new Error('Demo login is not available');
+         err.statusCode = 404;
+         throw err;
+      }
+      sendSession(res, user);
+   } catch (err) {
+      if (!err.statusCode) err.statusCode = 500;
+      next(err);
+   }
+};
+
+function sendSession(res, user) {
+   const userId = user._id.toString();
+   const token = jwt.sign({ email: user.email, userId }, process.env.JWT_SECRET, {
+      expiresIn: '1h'
+   });
+   res.status(200).json({ token, name: user.name, userId });
+}
 
 exports.getProfile = async (req, res, next) => {
    try {

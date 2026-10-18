@@ -14,7 +14,8 @@ const features = [
    {
       icon: Compass,
       title: 'Explore Destinations',
-      description: 'Discover new places through journals from travelers around the world.'
+      description:
+         'Discover new places on the journal map and through stories from travelers around the world.'
    },
    {
       icon: Users,

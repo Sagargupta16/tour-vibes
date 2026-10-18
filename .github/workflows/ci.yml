@@ -15,7 +15,8 @@ jobs:
       uses: Sagargupta16/shared-workflows/.github/workflows/node-ci.yml@main
       with:
          working-directory: server
-         run-tests: false
+         # node:test + supertest against an in-memory MongoDB (mongodb-memory-server)
+         run-tests: true
    format:
       name: Prettier
       runs-on: ubuntu-latest
@@ -27,3 +28,25 @@ jobs:
               cache: npm
          - run: npm ci --ignore-scripts
          - run: npm run format:check
+   docker:
+      name: Docker compose smoke test
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v6
+         - name: Generate a throwaway demo password
+           run: |
+              password=$(openssl rand -hex 24)
+              echo "::add-mask::$password"
+              echo "DEMO_PASSWORD=$password" >> "$GITHUB_ENV"
+         - run: docker compose up --build --detach --wait
+         - run: docker compose run --rm -e DEMO_PASSWORD api npm run seed
+         - name: Client serves the app, demo and password logins return a token
+           env:
+              DEMO_EMAIL: demo@demo.tourvibes.dev
+           run: |
+              curl -fsS --retry 10 --retry-connrefused --retry-delay 2 http://localhost:3000/journals | grep -q 'id="root"'
+              curl -fsS --retry 10 --retry-connrefused --retry-delay 2 -X POST http://localhost:8000/auth/demo | grep -q '"token"'
+              jq -n --arg email "$DEMO_EMAIL" --arg password "$DEMO_PASSWORD" '{$email, $password}' |
+                 curl -fsS -X POST -H 'Content-Type: application/json' --data @- http://localhost:8000/auth/login | grep -q '"token"'
+         - if: failure()
+           run: docker compose logs

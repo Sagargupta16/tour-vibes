@@ -11,11 +11,30 @@ import { api } from '@/lib/api';
 
 const AuthContext = createContext();
 
+// Read synchronously so the first render already knows the session. Restoring it
+// in an effect let ProtectedRoute redirect first, so reloading or opening a link
+// to any signed-in page (/map, /journals/:id) bounced to /journals.
+const readStoredSession = () => {
+   const token = localStorage.getItem('token');
+   const expiryDate = localStorage.getItem('expiryDate');
+   if (!token || !expiryDate) return null;
+   const remaining = new Date(expiryDate).getTime() - Date.now();
+   // An unparseable expiry gives NaN, which counts as expired
+   if (Number.isNaN(remaining) || remaining <= 0) return null;
+   return {
+      token,
+      remaining,
+      userId: localStorage.getItem('userId'),
+      name: localStorage.getItem('name') || ''
+   };
+};
+
 export function AuthProvider({ children }) {
-   const [isAuth, setIsAuth] = useState(false);
-   const [token, setToken] = useState(null);
-   const [userId, setUserId] = useState(null);
-   const [userName, setUserName] = useState('');
+   const [stored] = useState(readStoredSession);
+   const [isAuth, setIsAuth] = useState(Boolean(stored));
+   const [token, setToken] = useState(stored?.token ?? null);
+   const [userId, setUserId] = useState(stored?.userId ?? null);
+   const [userName, setUserName] = useState(stored?.name ?? '');
    const [loading, setLoading] = useState(false);
    const timerRef = useRef(null);
 
@@ -56,31 +75,24 @@ export function AuthProvider({ children }) {
    );
 
    useEffect(() => {
-      const storedToken = localStorage.getItem('token');
-      const expiryDate = localStorage.getItem('expiryDate');
-      if (!storedToken || !expiryDate) return;
-      const remaining = new Date(expiryDate).getTime() - Date.now();
-      if (remaining <= 0) {
+      if (stored) {
+         setAutoLogout(stored.remaining);
+      } else if (localStorage.getItem('token')) {
+         // Expired session left in storage
          logout();
-         return;
       }
-      setToken(storedToken);
-      setUserId(localStorage.getItem('userId'));
-      setUserName(localStorage.getItem('name') || '');
-      setIsAuth(true);
-      setAutoLogout(remaining);
-   }, [logout, setAutoLogout]);
+   }, [stored, logout, setAutoLogout]);
 
    useEffect(() => {
       globalThis.addEventListener('auth:expired', logout);
       return () => globalThis.removeEventListener('auth:expired', logout);
    }, [logout]);
 
-   const login = useCallback(
-      async (email, password) => {
+   const startSession = useCallback(
+      async (path, body) => {
          setLoading(true);
          try {
-            const data = await api.post('/auth/login', { email, password });
+            const data = await api.post(path, body);
             setSession(data);
             return data;
          } finally {
@@ -89,6 +101,14 @@ export function AuthProvider({ children }) {
       },
       [setSession]
    );
+
+   const login = useCallback(
+      (email, password) => startSession('/auth/login', { email, password }),
+      [startSession]
+   );
+
+   // Signs in as the server's DEMO_EMAIL account, no password involved
+   const demoLogin = useCallback(() => startSession('/auth/demo', {}), [startSession]);
 
    const signup = useCallback(async (name, email, password) => {
       setLoading(true);
@@ -100,8 +120,8 @@ export function AuthProvider({ children }) {
    }, []);
 
    const value = useMemo(
-      () => ({ isAuth, token, userId, userName, loading, login, signup, logout }),
-      [isAuth, token, userId, userName, loading, login, signup, logout]
+      () => ({ isAuth, token, userId, userName, loading, login, demoLogin, signup, logout }),
+      [isAuth, token, userId, userName, loading, login, demoLogin, signup, logout]
    );
 
    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
