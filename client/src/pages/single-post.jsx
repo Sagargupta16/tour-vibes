@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,8 @@ import LikeButton from '@/components/post/like-button';
 import CommentList from '@/components/post/comment-list';
 import SkeletonPost from '@/components/shared/skeleton-post';
 import PageTransition from '@/components/shared/page-transition';
+
+const PostLocationMap = lazy(() => import('@/components/map/post-location-map'));
 
 export default function SinglePost() {
    const { postId } = useParams();
@@ -102,6 +104,14 @@ export default function SinglePost() {
             <div className="prose prose-neutral dark:prose-invert mt-6 max-w-none">
                <p className="whitespace-pre-line">{post.content}</p>
             </div>
+
+            {post.location?.lat != null && (
+               <Suspense fallback={<div className="mt-6 h-56 animate-pulse rounded-lg bg-muted" />}>
+                  <div className="mt-6">
+                     <PostLocationMap lat={post.location.lat} lng={post.location.lng} />
+                  </div>
+               </Suspense>
+            )}
 
             <div className="mt-6">
                <LikeButton postId={post._id} likes={post.likes || []} />

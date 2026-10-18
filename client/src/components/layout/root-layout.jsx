@@ -1,6 +1,8 @@
+import { Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Header from './header';
+import PageLoader from '@/components/shared/page-loader';
 
 export default function RootLayout() {
    const location = useLocation();
@@ -11,7 +13,9 @@ export default function RootLayout() {
          <main className="flex-1">
             <AnimatePresence mode="wait">
                <div key={location.pathname}>
-                  <Outlet />
+                  <Suspense fallback={<PageLoader />}>
+                     <Outlet />
+                  </Suspense>
                </div>
             </AnimatePresence>
          </main>

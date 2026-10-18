@@ -25,6 +25,11 @@ export default function MobileNav() {
                   </NavLink>
                </SheetClose>
                <SheetClose asChild>
+                  <NavLink to="/map" className={linkClass}>
+                     Map
+                  </NavLink>
+               </SheetClose>
+               <SheetClose asChild>
                   <NavLink to="/profile" className={linkClass}>
                      Profile
                   </NavLink>
