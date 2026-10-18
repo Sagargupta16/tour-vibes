@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.7.0 - 2026-10-18
+
+### Security
+
+- Uploads are accepted only on the three routes that take a file (create post, update post, update profile), after the JWT check. Before, multer ran globally, so an anonymous multipart request to any path (even a 404) wrote a file to `server/images`
+- Updating a post no longer takes the image path from the request body. A user could point their post at another user's image and then delete it by deleting their own post
+- Every `/auth` route is now rate-limited: password change shares the 20 per 15 minutes login limit, profile reads and updates get 300 per 15 minutes (clears 8 CodeQL `js/missing-rate-limiting` alerts)
+- Login returns `Invalid email or password` for both unknown email and wrong password, so the error text no longer says which emails are registered. Signup still reports a taken email, and an unknown email skips the bcrypt compare, so the endpoints are not enumeration-proof yet
+
+### Fixed
+
+- A failed login showed `Session expired` instead of the server message: the client treated every 401 as an expired session. Now only a 401 on a request that carried a token logs out
+- A wrong current password on the change-password form logged the user out; the API now returns 422 for it
+- An upload over 5MB returned 500; it now returns 413 `File too large`
+- Replacing an avatar now deletes the old file instead of leaving it on disk
+- The avatar picker accepts only PNG/JPG, matching the server; other formats were dropped silently
+- `npm run install:all` now installs the root package too, so `npm run dev` finds `concurrently` on a fresh clone
+- `server` `npm start` runs `node app.js`; nodemon moved to `npm run dev` (the root `server` script uses it). `main` points at `app.js`
+- `.nvmrc` bumped from 19 to 24; Vite 8 needs Node 20.19+ or 22.12+
+- Client lint passes again (14 errors to 0): JSX `motion` usage, `import.meta.dirname` in `vite.config.js`, pure `timeAgo` in the comment list, fast refresh rule scoped off for shadcn primitives and contexts
+- Prettier drift in 3 client files
+
+### Added
+
+- `CI` workflow: client lint and build, server install, and Prettier check on every push and PR, via the shared `node-ci` workflow
+- README: architecture diagram, design decisions table, Node requirement, `VITE_API_URL`
+
 ## v0.6.4 - 2026-10-13
 
 ### Fixed

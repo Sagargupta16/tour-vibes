@@ -38,6 +38,8 @@ export default function useFeed({ userId, searchQuery, tag, sort } = {}) {
    );
 
    useEffect(() => {
+      // Refetch from page 1 whenever the query changes; this is the data fetch, not derived state
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPage(1);
       fetchPosts(1);
    }, [fetchPosts]);

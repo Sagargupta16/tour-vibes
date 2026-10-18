@@ -61,13 +61,14 @@ server/   -- Express 5 REST API with MongoDB (Mongoose 9)
 
 ### Backend (`server/`)
 
-Entry point: `app.js` -- Express, Multer (5MB limit, PNG/JPG only), CORS, MongoDB connection.
+Entry point: `app.js` -- Express, CORS, static `/images`, error handler, MongoDB connection.
 
 - `routes/feed.js` -- post CRUD, search, tags, likes, comments
-- `routes/auth.js` -- signup, login, profile, password change (rate-limited)
+- `routes/auth.js` -- signup, login, profile, password change (every route rate-limited)
 - `controllers/feed.js` / `controllers/auth.js` / `controllers/comment.js`
 - `models/post.js` / `models/users.js` / `models/comment.js`
 - `middleware/is-auth.js` -- JWT verification from `process.env.JWT_SECRET`
+- `middleware/upload.js` -- Multer (5MB, PNG/JPG), mounted per route after `isAuth` on create/update post and update profile
 - `util/helpers.js` -- shared pagination, path normalization, image cleanup
 
 **Key patterns:**

@@ -15,15 +15,17 @@ You should receive a response within 72 hours.
 
 | Version | Supported |
 |---------|-----------|
-| 0.6.x | Yes |
-| < 0.6 | No |
+| 0.7.x | Yes |
+| < 0.7 | No |
 
 ## Security Practices
 
 - JWT tokens signed with env-based secret, 1-hour expiry
 - Passwords hashed with bcryptjs (salt rounds: 12)
-- Auth endpoints rate-limited (20 requests per 15 minutes)
-- File uploads restricted to PNG/JPG, 5MB max
+- Signup, login and password change rate-limited (20 requests per 15 minutes); other auth and feed routes 300 per 15 minutes
+- File uploads restricted to PNG/JPG, 5MB max, accepted only on authenticated upload routes
+- Login returns one message for unknown email and wrong password
+- A post's image path is set only from the uploaded file, never from the request body
 - Post mutations require ownership verification
 - Image deletion validates path stays within `images/` directory
 - CORS restricted to configured `CLIENT_URL`

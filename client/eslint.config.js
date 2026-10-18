@@ -23,7 +23,16 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // core no-unused-vars does not see JSX member use like <motion.div>
+      'no-unused-vars': ['error', { varsIgnorePattern: '^(?:[A-Z_]|motion$)' }],
+    },
+  },
+  {
+    // shadcn primitives export variant helpers and contexts export hooks next to
+    // their component; fast refresh just does a full reload for these files
+    files: ['src/components/ui/**', 'src/contexts/**'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

@@ -73,7 +73,7 @@ exports.searchPosts = async (req, res, next) => {
    try {
       const page = parsePage(req.query.page);
       // Force primitive string; blocks NoSQL operator injection (e.g. { $regex: '.*' })
-      // Use explicit String() — ternary guard is not enough for Sonar taint analysis.
+      // Use explicit String() -- ternary guard is not enough for Sonar taint analysis.
       const q = String(req.query.q == null ? '' : req.query.q).trim();
       if (!q) {
          return res.status(200).json({ message: 'No query provided', posts: [], totalItems: 0 });
@@ -167,13 +167,9 @@ exports.updatePost = async (req, res, next) => {
          error.statusCode = 403;
          throw error;
       }
-      let imageUrl = req.body.image;
-      if (req.file) imageUrl = normalizePath(req.file.path);
-      if (!imageUrl) {
-         const error = new Error('No image provided');
-         error.statusCode = 422;
-         throw error;
-      }
+      // Never take the image path from the request body: a client could point its
+      // post at another user's file, then delete the post and with it that file.
+      const imageUrl = req.file ? normalizePath(req.file.path) : post.imageUrl;
       if (imageUrl !== post.imageUrl) clearImage(post.imageUrl);
       post.title = req.body.title;
       post.content = req.body.content;

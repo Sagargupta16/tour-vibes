@@ -18,8 +18,10 @@ export default function PostForm({ open, onOpenChange, editPost, onSubmit }) {
    const [travelDate, setTravelDate] = useState('');
    const [submitting, setSubmitting] = useState(false);
 
+   // Resets the form each time the dialog opens or the edited post changes
    useEffect(() => {
       if (editPost) {
+         // eslint-disable-next-line react-hooks/set-state-in-effect
          setTitle(editPost.title || '');
          setContent(editPost.content || '');
          setTags(editPost.tags?.join(', ') || '');

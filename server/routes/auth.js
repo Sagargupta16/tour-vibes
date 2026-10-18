@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const authControllers = require('../controllers/auth');
 const User = require('../models/users');
 const isAuth = require('../middleware/is-auth');
+const upload = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -12,6 +13,12 @@ const authLimiter = rateLimit({
    windowMs: 15 * 60 * 1000,
    max: 20,
    message: { message: 'Too many attempts, please try again after 15 minutes' }
+});
+
+const profileLimiter = rateLimit({
+   windowMs: 15 * 60 * 1000,
+   max: 300,
+   message: { message: 'Too many requests, please try again later' }
 });
 
 const signupValidation = [
@@ -60,9 +67,16 @@ const passwordValidation = [
 
 router.put('/signup', authLimiter, signupValidation, authControllers.signup);
 router.post('/login', authLimiter, loginValidation, authControllers.login);
-router.get('/profile', isAuth, authControllers.getProfile);
-router.put('/profile', isAuth, profileValidation, authControllers.updateProfile);
-router.put('/password', isAuth, passwordValidation, authControllers.changePassword);
-router.get('/user/:userId', isAuth, authControllers.getPublicProfile);
+router.get('/profile', profileLimiter, isAuth, authControllers.getProfile);
+router.put(
+   '/profile',
+   profileLimiter,
+   isAuth,
+   upload,
+   profileValidation,
+   authControllers.updateProfile
+);
+router.put('/password', authLimiter, isAuth, passwordValidation, authControllers.changePassword);
+router.get('/user/:userId', profileLimiter, isAuth, authControllers.getPublicProfile);
 
 module.exports = router;
