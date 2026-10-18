@@ -43,7 +43,7 @@ async function request(path, options = {}) {
 }
 
 export const api = {
-   get: (path) => request(path),
+   get: (path, options) => request(path, options),
    post: (path, body) =>
       request(path, {
          method: 'POST',

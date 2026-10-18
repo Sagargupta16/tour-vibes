@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '@/lib/api';
 
 const PER_PAGE = 10;
@@ -9,9 +9,15 @@ export default function useFeed({ userId, searchQuery, tag, sort } = {}) {
    const [page, setPage] = useState(1);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
+   const controller = useRef(null);
 
    const fetchPosts = useCallback(
       async (p) => {
+         // A newer search or page aborts the older request, so a slow response for
+         // an earlier query can never replace the results of the current one
+         controller.current?.abort();
+         const current = new AbortController();
+         controller.current = current;
          setLoading(true);
          setError(null);
          try {
@@ -26,10 +32,11 @@ export default function useFeed({ userId, searchQuery, tag, sort } = {}) {
                if (tag) params.set('tag', tag);
                path = `/feed/posts?${params}`;
             }
-            const data = await api.get(path);
+            const data = await api.get(path, { signal: current.signal });
             setPosts(data.posts || []);
             setTotalPosts(data.totalItems || 0);
          } catch (err) {
+            if (err.name === 'AbortError') return;
             setError(err.message);
          }
          setLoading(false);
@@ -43,6 +50,8 @@ export default function useFeed({ userId, searchQuery, tag, sort } = {}) {
       setPage(1);
       fetchPosts(1);
    }, [fetchPosts]);
+
+   useEffect(() => () => controller.current?.abort(), []);
 
    const goToPage = (p) => {
       setPage(p);
