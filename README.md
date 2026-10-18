@@ -56,7 +56,7 @@ A request goes through the same layers in the same order: rate limit, JWT check,
 | MongoDB text index on title, content, tags                       | Full-text search with relevance ranking, without running a search service                                       |
 | Image path always comes from multer, never the request body      | A client cannot point its post at someone else's file and delete it with its own post                           |
 | Stored filenames are `uuid.<ext>` from a MIME whitelist          | No user-controlled names on disk, so no path traversal                                                          |
-| One login error for unknown email and wrong password             | The login endpoint does not reveal which emails are registered                                                  |
+| One login error for unknown email and wrong password             | The error text does not say which emails exist (signup still reports a taken email)                             |
 
 ## Tech Stack
 

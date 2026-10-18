@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 - Uploads are accepted only on the three routes that take a file (create post, update post, update profile), after the JWT check. Before, multer ran globally, so an anonymous multipart request to any path (even a 404) wrote a file to `server/images`
 - Updating a post no longer takes the image path from the request body. A user could point their post at another user's image and then delete it by deleting their own post
 - Every `/auth` route is now rate-limited: password change shares the 20 per 15 minutes login limit, profile reads and updates get 300 per 15 minutes (clears 8 CodeQL `js/missing-rate-limiting` alerts)
-- Login returns `Invalid email or password` for both unknown email and wrong password, so it no longer reveals which emails are registered
+- Login returns `Invalid email or password` for both unknown email and wrong password, so the error text no longer says which emails are registered. Signup still reports a taken email, and an unknown email skips the bcrypt compare, so the endpoints are not enumeration-proof yet
 
 ### Fixed
 
