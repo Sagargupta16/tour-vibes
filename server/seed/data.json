@@ -1,0 +1,53 @@
+{
+  "_comment": "Demo content for npm run seed. Every person, trip and comment is made up; photos are credited in photos/CREDITS.md. post fields in comments and likes are indexes into posts.",
+  "emailDomain": "demo.tourvibes.dev",
+  "users": [
+    {"key":"demo","name":"Demo Traveler","bio":"The shared demo account. Look around!"},
+    {"key":"maya","name":"Maya Chen","bio":"Slow travel, street food and night trains."},
+    {"key":"arjun","name":"Arjun Rao","bio":"Mountains first, cities when it rains."},
+    {"key":"lena","name":"Lena Fischer","bio":"Photographer chasing soft morning light."},
+    {"key":"diego","name":"Diego Alvarez","bio":"Coastlines, ferries and long walks."}
+  ],
+  "posts": [
+    {"author":"maya","photo":49,"title":"Windmills above Oia","place":"Santorini","country":"Greece","lat":36.4618,"lng":25.3753,"travelDate":"2026-06-12","tags":["islands","sunset"],"content":"We climbed past the blue domes at six and still had to fight for a spot by the windmills. Worth it: the caldera goes pink for about ten minutes and then the whole village claps."},
+    {"author":"lena","photo":164,"title":"Lantern town by the river","place":"Hoi An","country":"Vietnam","lat":15.8801,"lng":108.338,"travelDate":"2026-02-03","tags":["river","food"],"content":"Boats drift past the yellow shopfronts all morning. I had cao lau three days in a row and a tailor made me a jacket in 24 hours."},
+    {"author":"lena","photo":116,"title":"Cypress roads of Val d'Orcia","place":"Pienza","country":"Italy","lat":43.0765,"lng":11.6789,"travelDate":"2025-09-21","tags":["roadtrip","countryside"],"content":"Rented a tiny Fiat and stopped every five minutes because every bend looks like a painting. Pecorino tasting in Pienza is non-negotiable."},
+    {"author":"diego","photo":142,"title":"A long walk to Chambord","place":"Chambord","country":"France","lat":47.6161,"lng":1.517,"travelDate":"2025-08-14","tags":["castles","cycling"],"content":"Cycled the Loire path from Blois. The approach down the long avenue is how the king wanted you to see it, and it still works."},
+    {"author":"arjun","photo":193,"title":"Punting past King's College","place":"Cambridge","country":"United Kingdom","lat":52.2043,"lng":0.1149,"travelDate":"2025-05-30","tags":["city","history"],"content":"Our punt guide fell in the river, which was the highlight. The chapel from the water is unreal."},
+    {"author":"maya","photo":43,"title":"Night walk across the Brooklyn Bridge","place":"New York","country":"United States","lat":40.7061,"lng":-73.9969,"travelDate":"2025-12-02","tags":["city","night"],"content":"Started in DUMBO, walked to Manhattan just after dark. Bring gloves in December; the wind on the span is no joke."},
+    {"author":"arjun","photo":184,"title":"Sunset over Erg Chebbi","place":"Merzouga","country":"Morocco","lat":31.099,"lng":-4.012,"travelDate":"2025-11-08","tags":["desert","sunset"],"content":"Camel ride out, sandboarding, then the quietest night of my life under more stars than I knew existed."},
+    {"author":"lena","photo":174,"title":"Balloon over the palms","place":"Luxor","country":"Egypt","lat":25.6872,"lng":32.6396,"travelDate":"2026-01-17","tags":["adventure","history"],"content":"A 5am pickup and a balloon over the West Bank. The Valley of the Kings looks tiny from up there."},
+    {"author":"diego","photo":200,"title":"Hairy coos of the Highlands","place":"Glencoe","country":"United Kingdom","lat":56.6826,"lng":-5.1023,"travelDate":"2025-07-04","tags":["wildlife","roadtrip"],"content":"Stopped the car for a cow. Stayed for an hour. Glencoe in the rain is moody in the best way."},
+    {"author":"arjun","photo":29,"title":"Trekking toward Everest Base Camp","place":"Khumbu","country":"Nepal","lat":27.9881,"lng":86.925,"travelDate":"2025-10-19","tags":["trekking","mountains"],"content":"Twelve days up, four down. Garlic soup every night for the altitude, and the view from Kala Patthar at sunrise made every step worth it."},
+    {"author":"maya","photo":78,"title":"An overwater morning","place":"Malé Atoll","country":"Maldives","lat":4.1755,"lng":73.5093,"travelDate":"2026-03-09","tags":["beach","islands"],"content":"Snorkelled straight off the jetty and saw a reef shark before breakfast. The water really is that colour."},
+    {"author":"diego","photo":15,"title":"Waterfalls after the rain","place":"Milford Sound","country":"New Zealand","lat":-44.6414,"lng":167.8974,"travelDate":"2026-04-22","tags":["hiking","waterfalls"],"content":"It rained all night, so every cliff had a waterfall by morning. The boat goes right under Stirling Falls; you will get soaked."},
+    {"author":"lena","photo":128,"title":"Quiet shores of Lake Bled","place":"Bled","country":"Slovenia","lat":46.3625,"lng":14.0936,"travelDate":"2025-06-11","tags":["lakes","mountains"],"content":"Rowed out to the island church and rang the bell for luck. Cream cake on the terrace afterwards, as tradition demands."},
+    {"author":"arjun","photo":177,"title":"Into the mist","place":"Zhangjiajie","country":"China","lat":29.3249,"lng":110.4343,"travelDate":"2026-05-02","tags":["hiking","mountains"],"content":"The sandstone pillars appear and vanish in the fog. The glass bridge is scarier than it looks in photos."},
+    {"author":"maya","photo":155,"title":"Coastal line to Kamakura","place":"Kamakura","country":"Japan","lat":35.3192,"lng":139.5467,"travelDate":"2026-04-05","tags":["trains","beach"],"content":"The Enoden train runs right along the sea. Got off at random stops, found a tiny ramen shop and the Great Buddha."},
+    {"author":"diego","photo":195,"title":"Fairy lights on a Lisbon side street","place":"Lisbon","country":"Portugal","lat":38.7139,"lng":-9.1394,"travelDate":"2025-12-20","tags":["city","night"],"content":"Every alley in Alfama has lights strung across it in December. Pastel de nata count for the trip: eleven."},
+    {"author":"lena","photo":11,"title":"Fog on the Olympic coast","place":"Olympic National Park","country":"United States","lat":47.8021,"lng":-123.6044,"travelDate":"2025-10-03","tags":["forest","hiking"],"content":"Moss on everything, fog rolling off the Pacific, and not another person on the trail for hours."},
+    {"author":"maya","photo":163,"title":"Cafe corner in Hanoi","place":"Hanoi","country":"Vietnam","lat":21.0285,"lng":105.8542,"travelDate":"2026-02-10","tags":["food","city"],"content":"Egg coffee in a plant-filled cafe up three flights of stairs. Hanoi rewards anyone who looks behind a doorway."},
+    {"author":"demo","photo":54,"title":"Clouds over Sugarloaf","place":"Rio de Janeiro","country":"Brazil","lat":-22.9486,"lng":-43.1566,"travelDate":"2026-01-28","tags":["city","mountains"],"content":"Took the cable car up just as the clouds broke. Copacabana on one side, the bay on the other."}
+  ],
+  "comments": [
+    {"author":"arjun","post":0,"text":"That light! Adding Oia to the list."},
+    {"author":"diego","post":0,"text":"Go in May, fewer crowds."},
+    {"author":"maya","post":9,"text":"Respect. How bad was the altitude?"},
+    {"author":"arjun","post":9,"text":"Fine below 4,500 m, then every step counted."},
+    {"author":"lena","post":11,"text":"Milford Sound is on my list for next year."},
+    {"author":"demo","post":5,"text":"Walked it last winter too, freezing but magic."},
+    {"author":"maya","post":15,"text":"Eleven is a respectable number."},
+    {"author":"diego","post":1,"text":"Did you get the jacket in time?"},
+    {"author":"lena","post":1,"text":"Picked it up the morning I left!"}
+  ],
+  "likes": [
+    {"post":0,"by":["arjun","diego","lena","demo"]},
+    {"post":9,"by":["maya","lena","diego"]},
+    {"post":11,"by":["maya","lena","arjun","demo"]},
+    {"post":1,"by":["maya","diego"]},
+    {"post":5,"by":["demo","arjun"]},
+    {"post":15,"by":["maya"]},
+    {"post":12,"by":["diego","arjun"]},
+    {"post":3,"by":["lena"]}
+  ]
+}

@@ -29,6 +29,7 @@
   },
   "scripts": {
     "dev": "nodemon app.js",
+    "seed": "node scripts/seed.js",
     "start": "node app.js",
     "test": "node --test --test-concurrency=1 test/"
   },

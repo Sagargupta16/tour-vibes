@@ -8,6 +8,11 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
 import PageTransition from '@/components/shared/page-transition';
 
+// Set both at build time (see the README) to show a one-click demo login, for a
+// deployment seeded with `npm run seed`
+const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL;
+const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD;
+
 export default function Login() {
    const { isAuth, login, loading } = useAuth();
    const navigate = useNavigate();
@@ -16,15 +21,19 @@ export default function Login() {
 
    if (isAuth) return <Navigate to="/journals" replace />;
 
-   const handleSubmit = async (e) => {
-      e.preventDefault();
+   const signIn = async (userEmail, userPassword) => {
       try {
-         await login(email, password);
+         await login(userEmail, userPassword);
          toast.success('Welcome back!');
          navigate('/journals', { replace: true });
       } catch (err) {
          toast.error(err.message);
       }
+   };
+
+   const handleSubmit = (e) => {
+      e.preventDefault();
+      signIn(email, password);
    };
 
    return (
@@ -64,6 +73,17 @@ export default function Login() {
                         {loading ? 'Signing in...' : 'Sign In'}
                      </Button>
                   </form>
+                  {DEMO_EMAIL && DEMO_PASSWORD && (
+                     <Button
+                        type="button"
+                        variant="outline"
+                        className="mt-3 w-full"
+                        disabled={loading}
+                        onClick={() => signIn(DEMO_EMAIL, DEMO_PASSWORD)}
+                     >
+                        Try the demo account
+                     </Button>
+                  )}
                   <p className="mt-4 text-center text-sm text-muted-foreground">
                      Don&apos;t have an account?{' '}
                      <Link to="/signup" className="font-medium text-foreground hover:underline">
