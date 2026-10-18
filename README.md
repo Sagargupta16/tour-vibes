@@ -10,7 +10,7 @@ A full-stack travel journal web application built with the MERN stack. Share tra
 
 > Note: This is a sample/reference project -- it is not actively deployed. `docker compose up --build` runs the whole stack locally, and `npm run seed` fills it with demo journals.
 
-Started in March 2023 and since rebuilt end to end: React 19 + Vite 8 on the front, an Express 5 REST API on Mongoose 9 at the back, JWT auth, image uploads, likes, comments, tags, full-text search and a map of every pinned journal. The backend checks ownership before every post edit or delete and every comment delete, rate-limits every API route, and accepts uploads only after authentication. 31 API tests run against an in-memory MongoDB on every push.
+Started in March 2023 and since rebuilt end to end: React 19 + Vite 8 on the front, an Express 5 REST API on Mongoose 9 at the back, JWT auth, image uploads, likes, comments, tags, full-text search and a map of every pinned journal. The backend checks ownership before every post edit or delete and every comment delete, rate-limits every API route, and accepts uploads only after authentication. 32 API tests run against an in-memory MongoDB on every push.
 
 ## Screenshots
 
@@ -104,7 +104,7 @@ docker compose up --build
 docker compose run --rm api npm run seed   # optional: demo journals
 ```
 
-Open http://localhost:3000 and use **Try the demo account** on the login page (`demo@demo.tourvibes.dev` / `tourvibes-demo`). Compose starts MongoDB 8, the API on port 8000 and the built client behind nginx on port 3000, with uploads and data in named volumes. It falls back to a local-only `JWT_SECRET`; set your own (`JWT_SECRET=... docker compose up`) before exposing it anywhere.
+Open http://localhost:3000 and use **Try the demo account** on the login page. It calls `POST /auth/demo`, which signs in as `demo@demo.tourvibes.dev` because compose sets `DEMO_EMAIL` on the API, so no demo password is stored anywhere. Compose starts MongoDB 8, the API on port 8000 and the built client behind nginx on port 3000, with uploads and data in named volumes. It falls back to a local-only `JWT_SECRET`; set your own (`JWT_SECRET=... docker compose up`) before exposing it anywhere.
 
 ### Without Docker
 
@@ -146,15 +146,16 @@ In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journ
 
 ## Environment Variables
 
-| Variable                                | Required    | Default                                | Description                                           |
-| --------------------------------------- | ----------- | -------------------------------------- | ----------------------------------------------------- |
-| `MONGODB_URI`                           | Yes         | `mongodb://localhost:27017/tour-vibes` | MongoDB connection string                             |
-| `JWT_SECRET`                            | Yes         | --                                     | Secret for signing JWT tokens                         |
-| `PORT`                                  | No          | `8000`                                 | Server port                                           |
-| `CLIENT_URL`                            | No          | `http://localhost:3000`                | Allowed CORS origin                                   |
-| `VITE_API_URL`                          | No (client) | `http://localhost:8000`                | API base URL baked into the client build              |
-| `VITE_DEMO_EMAIL`, `VITE_DEMO_PASSWORD` | No (client) | --                                     | Both set: the login page shows a one-click demo login |
-| `SEED_PASSWORD`                         | No (seed)   | `tourvibes-demo`                       | Password for the demo users `npm run seed` creates    |
+| Variable          | Required    | Default                                | Description                                         |
+| ----------------- | ----------- | -------------------------------------- | --------------------------------------------------- |
+| `MONGODB_URI`     | Yes         | `mongodb://localhost:27017/tour-vibes` | MongoDB connection string                           |
+| `JWT_SECRET`      | Yes         | --                                     | Secret for signing JWT tokens                       |
+| `PORT`            | No          | `8000`                                 | Server port                                         |
+| `CLIENT_URL`      | No          | `http://localhost:3000`                | Allowed CORS origin                                 |
+| `VITE_API_URL`    | No (client) | `http://localhost:8000`                | API base URL baked into the client build            |
+| `DEMO_EMAIL`      | No          | --                                     | Seeded demo account `POST /auth/demo` signs in as   |
+| `VITE_DEMO_LOGIN` | No (client) | --                                     | `true`: the login page shows a one-click demo login |
+| `SEED_PASSWORD`   | No (seed)   | random                                 | Password for the demo users `npm run seed` creates  |
 
 ## API Endpoints
 
@@ -164,6 +165,7 @@ In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journ
 | ------ | --------------- | -------------------------------------------- |
 | PUT    | `/signup`       | Register (rate-limited)                      |
 | POST   | `/login`        | Login (rate-limited)                         |
+| POST   | `/demo`         | Demo login as `DEMO_EMAIL` (rate-limited)    |
 | GET    | `/profile`      | Get own profile                              |
 | PUT    | `/profile`      | Update profile (name, bio, location, avatar) |
 | PUT    | `/password`     | Change password (rate-limited)               |
@@ -189,9 +191,9 @@ In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journ
 
 ## Testing
 
-`npm test` in `server/` runs 31 tests with `node:test` and supertest against the real Express app and an in-memory MongoDB (mongodb-memory-server). CI runs them on every push. They cover:
+`npm test` in `server/` runs 32 tests with `node:test` and supertest against the real Express app and an in-memory MongoDB (mongodb-memory-server). CI runs them on every push. They cover:
 
-- Security regressions: anonymous uploads never touch disk, a user cannot hijack and delete another user's image, cross-user edit and delete are 403, one login error for unknown email and wrong password, a NoSQL operator in place of the email is rejected, a wrong current password is a 422 that keeps the session, uploads over 5MB are a 413, a malformed id is a 400, every route sends rate-limit headers
+- Security regressions: anonymous uploads never touch disk, a user cannot hijack and delete another user's image, cross-user edit and delete are 403, one login error for unknown email and wrong password, a NoSQL operator in place of the email is rejected, a wrong current password is a 422 that keeps the session, uploads over 5MB are a 413, a malformed id is a 400, every route sends rate-limit headers, the demo login is off without `DEMO_EMAIL`
 - Feed behaviour: create with tags and pin, validation, newest/oldest/popular sorts, tag filter, pagination, text search, likes, comments, delete cascade
 - The map query: bounding boxes, a box across the antimeridian, world-wide boxes, malformed `bbox`
 
@@ -201,8 +203,8 @@ Measured with `npm run bundle:report` (raw and gzip sizes, kB = 1000 bytes). Bef
 
 |                                 |    Before |              After |
 | ------------------------------- | --------: | -----------------: |
-| JS loaded on first paint (raw)  | 673.12 kB | 596.15 kB (-11.4%) |
-| JS loaded on first paint (gzip) | 210.59 kB |  191.51 kB (-9.1%) |
+| JS loaded on first paint (raw)  | 673.12 kB | 596.27 kB (-11.4%) |
+| JS loaded on first paint (gzip) | 210.59 kB |  191.54 kB (-9.0%) |
 | Largest chunk (raw)             | 673.12 kB |          232.72 kB |
 | JS chunks                       |         1 |                 25 |
 

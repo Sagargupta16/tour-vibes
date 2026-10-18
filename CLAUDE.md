@@ -57,6 +57,7 @@ docker compose run --rm api npm run seed
 - `JWT_SECRET` -- required, server won't start without it
 - `PORT` -- defaults to 8000
 - `CLIENT_URL` -- defaults to `http://localhost:3000` (used for CORS)
+- `DEMO_EMAIL` -- optional, the seeded account `POST /auth/demo` signs in as
 
 **Client:** Copy `client/.env.example` to `client/.env`:
 - `VITE_API_URL` -- defaults to `http://localhost:8000`
@@ -110,7 +111,7 @@ Vite + React 19 + Tailwind CSS 4 + shadcn/ui. Minimalist/clean design with dark 
 - `pages/` -- home, login, signup, feed, my-journals, single-post, map, profile, not-found. Every page but home is `React.lazy` in `App.jsx`; `vite.config.js` puts React, Framer Motion and Leaflet in their own chunks
 
 **Key patterns:**
-- API base URL from `VITE_API_URL` env var (no hardcoded URLs); `VITE_DEMO_EMAIL` + `VITE_DEMO_PASSWORD` show a demo login button
+- API base URL from `VITE_API_URL` env var (no hardcoded URLs); `VITE_DEMO_LOGIN=true` shows a demo login button that calls `POST /auth/demo` (server signs in as `DEMO_EMAIL`)
 - The session is read from localStorage synchronously in `AuthProvider`, so protected routes do not redirect on reload
 - `use-feed` and `use-map-posts` abort the previous request before starting a new one
 - Auth via `useAuth()` context hook (no prop drilling)
@@ -121,7 +122,7 @@ Vite + React 19 + Tailwind CSS 4 + shadcn/ui. Minimalist/clean design with dark 
 
 ### API Endpoints
 
-**Auth:** `PUT /auth/signup`, `POST /auth/login`, `GET /auth/profile`, `PUT /auth/profile`, `PUT /auth/password`, `GET /auth/user/:userId`
+**Auth:** `PUT /auth/signup`, `POST /auth/login`, `POST /auth/demo`, `GET /auth/profile`, `PUT /auth/profile`, `PUT /auth/password`, `GET /auth/user/:userId`
 
 **Feed:** `GET|POST /feed/posts`, `GET|PUT|DELETE /feed/post/:postId`, `GET /feed/posts/:userId`, `GET /feed/search`, `GET /feed/tags`, `GET /feed/map`, `PUT /feed/post/:postId/like`
 

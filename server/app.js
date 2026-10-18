@@ -53,6 +53,7 @@ const start = async () => {
 };
 
 // `node app.js` starts the server; the tests require the app without listening
-if (require.main === module) start();
+// start() handles its own errors, so the promise is deliberately not awaited
+if (require.main === module) void start();
 
 module.exports = app;

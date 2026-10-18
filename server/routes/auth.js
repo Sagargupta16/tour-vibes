@@ -69,6 +69,7 @@ const passwordValidation = [
 
 router.put('/signup', authLimiter, signupValidation, authControllers.signup);
 router.post('/login', authLimiter, loginValidation, authControllers.login);
+router.post('/demo', authLimiter, authControllers.demoLogin);
 router.get('/profile', profileLimiter, isAuth, authControllers.getProfile);
 router.put(
    '/profile',

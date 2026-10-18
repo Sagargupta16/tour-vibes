@@ -19,6 +19,7 @@ const IMAGES_DIR = path.join(__dirname, '..', 'images');
 // Smallest PNG header; multer only checks the MIME type, which supertest derives
 // from the .png filename
 const PNG = Buffer.from('89504e470d0a1a0a0000000d49484452', 'hex');
+const PHOTO = { data: PNG, name: 'photo.png' };
 
 const listImages = () => new Set(fs.readdirSync(IMAGES_DIR).filter((f) => f !== '.gitkeep'));
 
@@ -61,7 +62,7 @@ const createUser = async (name, password = 'password123') => {
 const auth = (user) => ({ Authorization: `Bearer ${user.token}` });
 
 // Multipart create through the real route, so multer and validation both run
-const createPost = (user, fields = {}, file = { data: PNG, name: 'photo.png' }) => {
+const createPost = (user, fields = {}, file = PHOTO) => {
    const req = request(app).post('/feed/posts').set(auth(user));
    const all = { title: 'A day in Lisbon', content: 'Trams, tiles and custard tarts', ...fields };
    for (const [key, value] of Object.entries(all)) req.field(key, value);

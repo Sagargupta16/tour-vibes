@@ -22,6 +22,8 @@ services:
       MONGODB_URI: mongodb://mongo:27017/tour-vibes
       JWT_SECRET: ${JWT_SECRET:-local-only-change-me}
       CLIENT_URL: http://localhost:3000
+      # Enables the one-click demo login (POST /auth/demo) for this seeded account
+      DEMO_EMAIL: demo@demo.tourvibes.dev
       PORT: "8000"
     ports:
       - "8000:8000"
@@ -36,11 +38,10 @@ services:
       context: ./client
       args:
         VITE_API_URL: http://localhost:8000
-        # Shows the one-click demo login; matches the seed script's default
-        VITE_DEMO_EMAIL: demo@demo.tourvibes.dev
-        VITE_DEMO_PASSWORD: tourvibes-demo
+        # Shows the one-click demo login button
+        VITE_DEMO_LOGIN: "true"
     ports:
-      - "3000:80"
+      - "3000:8080"
     depends_on:
       - api
 

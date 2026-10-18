@@ -8,22 +8,21 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
 import PageTransition from '@/components/shared/page-transition';
 
-// Set both at build time (see the README) to show a one-click demo login, for a
-// deployment seeded with `npm run seed`
-const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL;
-const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD;
+// Set at build time (see the README) to show a one-click demo login, for a
+// deployment seeded with `npm run seed` whose API has DEMO_EMAIL set
+const DEMO_LOGIN = import.meta.env.VITE_DEMO_LOGIN === 'true';
 
 export default function Login() {
-   const { isAuth, login, loading } = useAuth();
+   const { isAuth, login, demoLogin, loading } = useAuth();
    const navigate = useNavigate();
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
 
    if (isAuth) return <Navigate to="/journals" replace />;
 
-   const signIn = async (userEmail, userPassword) => {
+   const signIn = async (startSession) => {
       try {
-         await login(userEmail, userPassword);
+         await startSession();
          toast.success('Welcome back!');
          navigate('/journals', { replace: true });
       } catch (err) {
@@ -33,7 +32,7 @@ export default function Login() {
 
    const handleSubmit = (e) => {
       e.preventDefault();
-      signIn(email, password);
+      void signIn(() => login(email, password));
    };
 
    return (
@@ -73,13 +72,13 @@ export default function Login() {
                         {loading ? 'Signing in...' : 'Sign In'}
                      </Button>
                   </form>
-                  {DEMO_EMAIL && DEMO_PASSWORD && (
+                  {DEMO_LOGIN && (
                      <Button
                         type="button"
                         variant="outline"
                         className="mt-3 w-full"
                         disabled={loading}
-                        onClick={() => signIn(DEMO_EMAIL, DEMO_PASSWORD)}
+                        onClick={() => void signIn(demoLogin)}
                      >
                         Try the demo account
                      </Button>

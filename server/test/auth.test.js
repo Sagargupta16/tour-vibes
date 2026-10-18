@@ -72,3 +72,24 @@ test('a public profile hides email and password', async () => {
    assert.equal(res.body.user.email, undefined);
    assert.equal(res.body.user.password, undefined);
 });
+
+test('demo login signs in as DEMO_EMAIL and is off without it', async () => {
+   const alice = await createUser('Alice');
+   delete process.env.DEMO_EMAIL;
+   const off = await request(app).post('/auth/demo');
+   assert.equal(off.status, 404);
+
+   process.env.DEMO_EMAIL = alice.email.toUpperCase();
+   try {
+      const demo = await request(app).post('/auth/demo');
+      assert.equal(demo.status, 200);
+      assert.equal(demo.body.userId, alice.id);
+      assert.equal(demo.headers['x-ratelimit-limit'], '20');
+      const profile = await request(app)
+         .get('/auth/profile')
+         .set('Authorization', `Bearer ${demo.body.token}`);
+      assert.equal(profile.body.user.name, 'Alice');
+   } finally {
+      delete process.env.DEMO_EMAIL;
+   }
+});

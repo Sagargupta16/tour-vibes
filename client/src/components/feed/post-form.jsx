@@ -13,6 +13,29 @@ const LocationPicker = lazy(() => import('@/components/map/location-picker'));
 const pinOf = (post) =>
    post?.location?.lat == null ? null : { lat: post.location.lat, lng: post.location.lng };
 
+const buildFormData = (fields, editPost) => {
+   const { title, content, image, tags, locationName, locationCountry, travelDate, pin } = fields;
+   const formData = new FormData();
+   formData.append('title', title);
+   formData.append('content', content);
+   if (image) formData.append('image', image);
+   if (!image && editPost) formData.append('image', editPost.imageUrl);
+   const parsedTags = tags
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+   if (parsedTags.length) formData.append('tags', JSON.stringify(parsedTags));
+   if (locationName) formData.append('locationName', locationName);
+   if (locationCountry) formData.append('locationCountry', locationCountry);
+   if (travelDate) formData.append('travelDate', travelDate);
+   // Empty lat/lng on an edit removes an existing pin
+   if (pin || pinOf(editPost)) {
+      formData.append('lat', pin ? String(pin.lat) : '');
+      formData.append('lng', pin ? String(pin.lng) : '');
+   }
+   return formData;
+};
+
 export default function PostForm({ open, onOpenChange, editPost, onSubmit }) {
    const [title, setTitle] = useState('');
    const [content, setContent] = useState('');
@@ -68,25 +91,17 @@ export default function PostForm({ open, onOpenChange, editPost, onSubmit }) {
       }
       setSubmitting(true);
       try {
-         const formData = new FormData();
-         formData.append('title', title);
-         formData.append('content', content);
-         if (image) formData.append('image', image);
-         if (!image && editPost) formData.append('image', editPost.imageUrl);
-         const parsedTags = tags
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean);
-         if (parsedTags.length) formData.append('tags', JSON.stringify(parsedTags));
-         if (locationName) formData.append('locationName', locationName);
-         if (locationCountry) formData.append('locationCountry', locationCountry);
-         if (travelDate) formData.append('travelDate', travelDate);
-         // Empty lat/lng on an edit removes an existing pin
-         if (pin || pinOf(editPost)) {
-            formData.append('lat', pin ? String(pin.lat) : '');
-            formData.append('lng', pin ? String(pin.lng) : '');
-         }
-         await onSubmit(formData);
+         const fields = {
+            title,
+            content,
+            image,
+            tags,
+            locationName,
+            locationCountry,
+            travelDate,
+            pin
+         };
+         await onSubmit(buildFormData(fields, editPost));
          toast.success(editPost ? 'Post updated!' : 'Post created!');
          onOpenChange(false);
       } catch (err) {

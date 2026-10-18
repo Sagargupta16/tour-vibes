@@ -68,6 +68,7 @@ function JournalMarker({ post }) {
 
 export default function MapPage() {
    const { posts, truncated, loading, load } = useMapPosts();
+   const inView = `${posts.length}${truncated ? '+' : ''} in view`;
 
    return (
       <PageTransition>
@@ -81,7 +82,7 @@ export default function MapPage() {
                </div>
                <span className="flex items-center gap-1 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
-                  {loading ? 'Loading...' : `${posts.length}${truncated ? '+' : ''} in view`}
+                  {loading ? 'Loading...' : inView}
                </span>
             </div>
             <MapBase

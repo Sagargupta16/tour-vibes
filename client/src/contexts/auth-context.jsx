@@ -19,7 +19,8 @@ const readStoredSession = () => {
    const expiryDate = localStorage.getItem('expiryDate');
    if (!token || !expiryDate) return null;
    const remaining = new Date(expiryDate).getTime() - Date.now();
-   if (!(remaining > 0)) return null;
+   // An unparseable expiry gives NaN, which counts as expired
+   if (Number.isNaN(remaining) || remaining <= 0) return null;
    return {
       token,
       remaining,
@@ -87,11 +88,11 @@ export function AuthProvider({ children }) {
       return () => globalThis.removeEventListener('auth:expired', logout);
    }, [logout]);
 
-   const login = useCallback(
-      async (email, password) => {
+   const startSession = useCallback(
+      async (path, body) => {
          setLoading(true);
          try {
-            const data = await api.post('/auth/login', { email, password });
+            const data = await api.post(path, body);
             setSession(data);
             return data;
          } finally {
@@ -100,6 +101,14 @@ export function AuthProvider({ children }) {
       },
       [setSession]
    );
+
+   const login = useCallback(
+      (email, password) => startSession('/auth/login', { email, password }),
+      [startSession]
+   );
+
+   // Signs in as the server's DEMO_EMAIL account, no password involved
+   const demoLogin = useCallback(() => startSession('/auth/demo', {}), [startSession]);
 
    const signup = useCallback(async (name, email, password) => {
       setLoading(true);
@@ -111,8 +120,8 @@ export function AuthProvider({ children }) {
    }, []);
 
    const value = useMemo(
-      () => ({ isAuth, token, userId, userName, loading, login, signup, logout }),
-      [isAuth, token, userId, userName, loading, login, signup, logout]
+      () => ({ isAuth, token, userId, userName, loading, login, demoLogin, signup, logout }),
+      [isAuth, token, userId, userName, loading, login, demoLogin, signup, logout]
    );
 
    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
