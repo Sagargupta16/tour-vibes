@@ -1,0 +1,49 @@
+# One-command local stack: MongoDB, the API and the built client.
+#
+#   docker compose up --build
+#   docker compose run --rm api npm run seed     (optional demo journals)
+#
+# Then open http://localhost:3000. JWT_SECRET falls back to a local-only value;
+# set your own (JWT_SECRET=... docker compose up) before exposing this anywhere.
+services:
+  mongo:
+    image: mongo:8
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./server
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/tour-vibes
+      JWT_SECRET: ${JWT_SECRET:-local-only-change-me}
+      CLIENT_URL: http://localhost:3000
+      PORT: "8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - uploads:/app/images
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./client
+      args:
+        VITE_API_URL: http://localhost:8000
+        # Shows the one-click demo login; matches the seed script's default
+        VITE_DEMO_EMAIL: demo@demo.tourvibes.dev
+        VITE_DEMO_PASSWORD: tourvibes-demo
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  mongo-data:
+  uploads:

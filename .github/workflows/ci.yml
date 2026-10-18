@@ -28,3 +28,18 @@ jobs:
               cache: npm
          - run: npm ci --ignore-scripts
          - run: npm run format:check
+   docker:
+      name: Docker compose smoke test
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v6
+         - run: docker compose up --build --detach --wait
+         - run: docker compose run --rm api npm run seed
+         - name: Client serves the app, demo login returns a token
+           run: |
+              curl -fsS --retry 10 --retry-connrefused --retry-delay 2 http://localhost:3000/journals | grep -q 'id="root"'
+              curl -fsS --retry 10 --retry-connrefused --retry-delay 2 -X POST http://localhost:8000/auth/login \
+                 -H 'Content-Type: application/json' \
+                 -d '{"email":"demo@demo.tourvibes.dev","password":"tourvibes-demo"}' | grep -q '"token"'
+         - if: failure()
+           run: docker compose logs
