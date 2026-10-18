@@ -10,7 +10,8 @@ const {
    normalizePath,
    clearImage,
    getSortOption,
-   parseTags
+   parseTags,
+   parseCoordinates
 } = require('../util/helpers');
 
 exports.getPosts = async (req, res, next) => {
@@ -114,10 +115,12 @@ exports.createPost = async (req, res, next) => {
          creator: req.userId
       };
       if (req.body.tags) postData.tags = parseTags(req.body.tags);
-      if (req.body.locationName || req.body.locationCountry) {
+      const coords = parseCoordinates(req.body);
+      if (req.body.locationName || req.body.locationCountry || coords) {
          postData.location = {
             name: req.body.locationName || '',
-            country: req.body.locationCountry || ''
+            country: req.body.locationCountry || '',
+            ...coords
          };
       }
       if (req.body.travelDate) postData.travelDate = new Date(req.body.travelDate);
@@ -176,10 +179,14 @@ exports.updatePost = async (req, res, next) => {
       post.imageUrl = imageUrl;
       if (req.body.tags) post.tags = parseTags(req.body.tags);
       if (req.body.locationName !== undefined || req.body.locationCountry !== undefined) {
-         post.location = {
-            name: req.body.locationName || post.location.name,
-            country: req.body.locationCountry || post.location.country
-         };
+         post.location.name = req.body.locationName || post.location.name;
+         post.location.country = req.body.locationCountry || post.location.country;
+      }
+      // undefined: pin not sent, keep it; null: pin removed; object: pin moved
+      const coords = parseCoordinates(req.body);
+      if (coords !== undefined) {
+         post.location.lat = coords?.lat;
+         post.location.lng = coords?.lng;
       }
       if (req.body.travelDate) post.travelDate = new Date(req.body.travelDate);
       const result = await post.save();
@@ -209,32 +216,6 @@ exports.deletePost = async (req, res, next) => {
       await Comment.deleteMany({ post: post._id });
       await User.findByIdAndUpdate(req.userId, { $pull: { posts: post._id } });
       res.status(200).json({ message: 'Post deleted successfully' });
-   } catch (err) {
-      if (!err.statusCode) err.statusCode = 500;
-      next(err);
-   }
-};
-
-exports.toggleLike = async (req, res, next) => {
-   try {
-      const post = await Post.findById(req.params.postId);
-      if (!post) {
-         const error = new Error('No post found');
-         error.statusCode = 404;
-         throw error;
-      }
-      const alreadyLiked = post.likes.some((id) => id.toString() === req.userId);
-      if (alreadyLiked) {
-         post.likes.pull(req.userId);
-      } else {
-         post.likes.push(req.userId);
-      }
-      await post.save();
-      res.status(200).json({
-         message: alreadyLiked ? 'Post unliked' : 'Post liked',
-         liked: !alreadyLiked,
-         likesCount: post.likes.length
-      });
    } catch (err) {
       if (!err.statusCode) err.statusCode = 500;
       next(err);
