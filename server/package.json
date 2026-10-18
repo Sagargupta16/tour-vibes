@@ -15,7 +15,9 @@
   },
   "description": "Express REST API for the Tour Vibes travel journal",
   "devDependencies": {
-    "nodemon": "^3.0.0"
+    "mongodb-memory-server": "^11.3.0",
+    "nodemon": "^3.0.0",
+    "supertest": "^7.3.1"
   },
   "license": "MIT",
   "main": "app.js",
@@ -28,7 +30,7 @@
   "scripts": {
     "dev": "nodemon app.js",
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test --test-concurrency=1 test/"
   },
   "version": "1.1.0"
 }

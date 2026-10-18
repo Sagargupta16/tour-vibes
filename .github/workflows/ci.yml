@@ -15,7 +15,8 @@ jobs:
       uses: Sagargupta16/shared-workflows/.github/workflows/node-ci.yml@main
       with:
          working-directory: server
-         run-tests: false
+         # node:test + supertest against an in-memory MongoDB (mongodb-memory-server)
+         run-tests: true
    format:
       name: Prettier
       runs-on: ubuntu-latest
