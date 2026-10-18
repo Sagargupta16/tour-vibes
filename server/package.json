@@ -31,7 +31,7 @@
     "dev": "nodemon app.js",
     "seed": "node scripts/seed.js",
     "start": "node app.js",
-    "test": "node --test --test-concurrency=1 test/"
+    "test": "node --test --test-concurrency=1 \"test/*.test.js\""
   },
   "version": "1.2.0"
 }
