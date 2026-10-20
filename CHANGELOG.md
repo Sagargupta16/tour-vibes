@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file.
 - Sign in and sign up: split layout with an animated route illustration, show/hide password, a strength meter, field-level errors and a shake on failure. Sign up signs the user in straight away
 - Profile: the avatar uploads as soon as it is picked with a live preview, a bio counter, unsaved-changes tracking and a link to the public traveler page
 - My Journals: journal, place and like totals
-- A design system: one blue accent in both themes, Schibsted Grotesk for headings (self-hosted like Inter), shared motion tokens in `src/lib/motion.js`, page transitions, a solid header with a sliding active-page pill, a theme toggle that grows the new theme out of the button, and a footer with links. Open Graph and Twitter tags, theme-color and a new favicon
+- A design system: one blue accent in both themes, Schibsted Grotesk for headings (self-hosted like Inter), shared motion tokens in `src/lib/motion.js`, page transitions, a solid header with a sliding active-page pill, a theme toggle that grows the new theme out of the button, and a footer with links. Open Graph and Twitter tags with a 1200x630 share card, theme-color, an apple-touch-icon and a new favicon
 - 20 more API tests (52 in total): public reads, anonymous writes, stale tokens on public routes, the public profile field list, and a regression test for most of the server fixes below
 
 ### Changed
