@@ -50,6 +50,7 @@ All notable changes to this project will be documented in this file.
 - A signed-in name change did not reach the header until the next login
 - Map markers flickered away when a pan finished while the previous request was being read
 - Dark map tiles showed hairline seams between tile rows on high-DPI phones
+- Switching the theme again mid-animation left an unhandled promise rejection from the skipped view transition
 - The comment form showed for anonymous visitors, whose comments then failed with a 401; the sort select showed the raw value `newest`; tag chips and comment delete buttons were not reachable or named for keyboard and screen reader users
 
 ## v0.8.0 - 2026-10-18
