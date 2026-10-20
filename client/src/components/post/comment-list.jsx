@@ -32,7 +32,7 @@ export default function CommentList({ postId }) {
             setState({ key: requestKey, comments: [], error: err.message });
          }
       };
-      load();
+      void load();
       return () => controller.abort();
    }, [postId, requestKey]);
 
@@ -56,7 +56,7 @@ export default function CommentList({ postId }) {
             id="comments-title"
             className="flex items-center gap-2 text-xl font-semibold tracking-tight"
          >
-            Comments
+            <span>Comments</span>
             <span className="relative inline-grid min-w-7 place-items-center overflow-hidden rounded-full bg-muted px-2 py-0.5 text-sm font-medium text-muted-foreground tabular-nums">
                <AnimatePresence mode="popLayout" initial={false}>
                   <motion.span

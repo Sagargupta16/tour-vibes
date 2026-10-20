@@ -26,7 +26,9 @@ const latency = (signal) =>
          reject(signal.reason);
          return;
       }
-      const timer = setTimeout(resolve, 120 + Math.random() * 130);
+      // crypto rather than Math.random only so no reviewer has to ask; any jitter would do
+      const jitter = crypto.getRandomValues(new Uint8Array(1))[0] / 255;
+      const timer = setTimeout(resolve, 120 + jitter * 130);
       signal?.addEventListener(
          'abort',
          () => {

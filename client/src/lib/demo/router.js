@@ -120,7 +120,7 @@ export function createRouter({ store, images, loadSeed, now = Date.now }) {
    };
 
    const run = async ({ method = 'GET', path, headers, body }) => {
-      const url = new URL(path, 'http://demo.local');
+      const url = new URL(path, 'https://demo.local');
       const verb = method.toUpperCase();
       const { route, params } = findRoute(verb, url.pathname);
       for (const [name, value] of Object.entries(params)) {

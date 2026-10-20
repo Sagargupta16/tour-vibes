@@ -40,7 +40,7 @@ export default function JournalStats({ userId, posts, totalPosts, lastPage }) {
             // Falls back to counting the visible page
          }
       };
-      load();
+      void load();
       return () => controller.abort();
    }, [userId, lastPage, allKey]);
 

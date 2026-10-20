@@ -64,7 +64,7 @@ export default function Profile() {
             if (!signal.aborted && err.name !== 'AbortError') setStatus('error');
          }
       };
-      load();
+      void load();
       return () => controller.abort();
    }, [updateUser, attempt]);
 

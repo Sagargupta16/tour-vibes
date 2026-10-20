@@ -1,4 +1,7 @@
-/* Shared tv-* utilities. Use them like any Tailwind class: className="tv-eyebrow". */
+/* Shared tv-* utilities. Use them like any Tailwind class: className="tv-eyebrow".
+   Each @utility holds the declarations for the element itself; its states,
+   pseudo-elements and breakpoints are plain rules in the utilities layer below it,
+   so every CSS parser (not only Tailwind's) reads them. */
 
 /* Page width container: <div className="tv-container"> */
 @utility tv-container {
@@ -6,9 +9,13 @@
    max-width: 72rem;
    margin-inline: auto;
    padding-inline: 1rem;
+}
 
+@layer utilities {
    @media (width >= 40rem) {
-      padding-inline: 1.5rem;
+      .tv-container {
+         padding-inline: 1.5rem;
+      }
    }
 }
 
@@ -27,8 +34,10 @@
 @utility tv-link {
    position: relative;
    text-decoration: none;
+}
 
-   &::after {
+@layer utilities {
+   .tv-link::after {
       content: '';
       position: absolute;
       inset-inline: 0;
@@ -40,7 +49,7 @@
       transition: transform 250ms var(--ease-out);
    }
 
-   &:hover::after {
+   .tv-link:hover::after {
       transform: scaleX(1);
       transform-origin: left;
    }
@@ -51,13 +60,15 @@
    transition:
       transform 250ms var(--ease-out),
       border-color 200ms var(--ease-out);
+}
 
-   &:hover {
+@layer utilities {
+   .tv-card-interactive:hover {
       transform: translateY(-3px);
       border-color: color-mix(in oklch, var(--primary) 45%, var(--border));
    }
 
-   &:active {
+   .tv-card-interactive:active {
       transform: translateY(-1px) scale(0.99);
    }
 }
@@ -65,8 +76,10 @@
 /* Tactile press for custom buttons (shadcn Button already has it) */
 @utility tv-press {
    transition: transform 150ms var(--ease-out);
+}
 
-   &:active {
+@layer utilities {
+   .tv-press:active {
       transform: scale(0.96);
    }
 }
@@ -74,8 +87,10 @@
 /* Grows the tap area of a small control to at least 44px without moving layout */
 @utility tv-hit {
    position: relative;
+}
 
-   &::before {
+@layer utilities {
+   .tv-hit::before {
       content: '';
       position: absolute;
       inset: 50% auto auto 50%;
@@ -89,8 +104,10 @@
 @utility tv-img-outline {
    outline: 1px solid rgb(0 0 0 / 0.1);
    outline-offset: -1px;
+}
 
-   &:where(.dark *) {
+@layer utilities {
+   .tv-img-outline:where(.dark *) {
       outline-color: rgb(255 255 255 / 0.1);
    }
 }
@@ -107,8 +124,10 @@
 /* Horizontal scrollers (snap carousels) without a visible scrollbar */
 @utility tv-no-scrollbar {
    scrollbar-width: none;
+}
 
-   &::-webkit-scrollbar {
+@layer utilities {
+   .tv-no-scrollbar::-webkit-scrollbar {
       display: none;
    }
 }

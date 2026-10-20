@@ -9,8 +9,10 @@ const PAGE_CAP = 5;
 
 const EMPTY = { key: null, status: 'loading', user: null, posts: [], total: 0, page: 0 };
 
-const fetchPage = (userId, page, signal) =>
-   api.get(`/feed/posts/${userId}${page > 1 ? `?page=${page}` : ''}`, { signal });
+const fetchPage = (userId, page, signal) => {
+   const query = page > 1 ? `?page=${page}` : '';
+   return api.get(`/feed/posts/${userId}${query}`, { signal });
+};
 
 const dedupe = (posts) => {
    const seen = new Set();

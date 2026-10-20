@@ -48,13 +48,14 @@ function Pin({ stop, point, index, active, onSelect }) {
             <Tag
                {...linkProps}
                onMouseEnter={onSelect}
-               aria-label={`${stop.name}${stop.country ? `, ${stop.country}` : ''}`}
+               aria-label={stop.country ? `${stop.name}, ${stop.country}` : stop.name}
                className={cn(
                   'tv-hit block origin-bottom text-primary transition-transform duration-200 ease-out hover:-translate-y-1 hover:scale-110',
                   active && 'scale-110'
                )}
             >
                <svg
+                  aria-hidden="true"
                   viewBox="0 0 24 30"
                   className="h-7 w-[22px] drop-shadow-[0_3px_3px_rgb(0_0_0/0.25)]"
                >

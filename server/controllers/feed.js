@@ -12,7 +12,8 @@ const {
    discardUpload,
    getSortOption,
    parseTags,
-   parseCoordinates
+   parseCoordinates,
+   applyPostEdits
 } = require('../util/helpers');
 
 exports.getPosts = async (req, res, next) => {
@@ -181,22 +182,8 @@ exports.updatePost = async (req, res, next) => {
       // post at another user's file, then delete the post and with it that file.
       const imageUrl = req.file ? normalizePath(req.file.path) : post.imageUrl;
       const oldImageUrl = post.imageUrl;
-      post.title = req.body.title;
-      post.content = req.body.content;
       post.imageUrl = imageUrl;
-      if (req.body.tags) post.tags = parseTags(req.body.tags);
-      // An empty field clears the value; a field that was not sent keeps it
-      if (req.body.locationName !== undefined) post.location.name = req.body.locationName;
-      if (req.body.locationCountry !== undefined) post.location.country = req.body.locationCountry;
-      // undefined: pin not sent, keep it; null: pin removed; object: pin moved
-      const coords = parseCoordinates(req.body);
-      if (coords !== undefined) {
-         post.location.lat = coords?.lat;
-         post.location.lng = coords?.lng;
-      }
-      if (req.body.travelDate !== undefined) {
-         post.travelDate = req.body.travelDate ? new Date(req.body.travelDate) : undefined;
-      }
+      applyPostEdits(post, req.body);
       const result = await post.save();
       saved = true;
       // Only now is the old file unreferenced; clearing it before the save broke the post

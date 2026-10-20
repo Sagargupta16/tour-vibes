@@ -60,7 +60,7 @@ export default function SinglePost() {
             setState({ key: requestKey, post: null, error: err });
          }
       };
-      load();
+      void load();
       return () => controller.abort();
    }, [postId, requestKey]);
 

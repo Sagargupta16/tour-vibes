@@ -2,7 +2,7 @@
 // server/routes/feed.js (title and content at least 5 characters) and
 // server/middleware/upload.js (PNG or JPG, 5 MB).
 
-const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
+const IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/jpg']);
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export const MIN_LENGTH = 5;
 
@@ -20,7 +20,7 @@ export const initialValues = (post) => ({
 });
 
 export const checkImage = (file) => {
-   if (!IMAGE_TYPES.includes(file.type)) return 'Use a PNG or JPG photo';
+   if (!IMAGE_TYPES.has(file.type)) return 'Use a PNG or JPG photo';
    if (file.size > MAX_IMAGE_BYTES) return 'The photo must be 5 MB or smaller';
    return null;
 };

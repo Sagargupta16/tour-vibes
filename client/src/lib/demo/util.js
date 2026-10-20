@@ -47,12 +47,21 @@ export const httpError = (statusCode, message, data) =>
 // What express-validator's sanitizers see: missing fields become ''
 export const text = (value) => (value == null ? '' : String(value));
 
-export const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+// Same as /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/ without the regex backtracking: one @ with
+// something before it, and a dot in the domain with 1+ characters before and 2+ after
+export const isEmail = (value) => {
+   const s = text(value);
+   const at = s.indexOf('@');
+   if (at < 1 || at !== s.lastIndexOf('@') || /\s/.test(s)) return false;
+   const domain = s.slice(at + 1);
+   const dot = domain.indexOf('.', 1);
+   return dot !== -1 && dot <= domain.length - 3;
+};
 
 export const isFloatIn = (value, min, max) => {
    const raw = text(value).trim();
    const n = Number(raw);
-   return /^[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i.test(raw) && n >= min && n <= max;
+   return /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[-+]?\d+)?$/i.test(raw) && n >= min && n <= max;
 };
 
 // Collects failed checks and throws the server's 422: { message, data: [...] }

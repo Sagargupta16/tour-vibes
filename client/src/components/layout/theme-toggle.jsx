@@ -24,7 +24,13 @@ async function revealTheme(origin, apply) {
    const y = rect.top + rect.height / 2;
    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
    const transition = document.startViewTransition(() => flushSync(apply));
-   await transition.ready;
+   try {
+      await transition.ready;
+   } catch {
+      // A skipped transition (a second click mid-animation) rejects here; the theme
+      // has already switched, only the reveal is lost
+      return;
+   }
    document.documentElement.animate(
       { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
       {
@@ -40,7 +46,7 @@ export default function ThemeToggle({ className }) {
    const isDark = resolvedTheme === 'dark';
 
    const toggle = (event) => {
-      revealTheme(event.currentTarget, () => setTheme(isDark ? 'light' : 'dark'));
+      void revealTheme(event.currentTarget, () => setTheme(isDark ? 'light' : 'dark'));
    };
 
    return (

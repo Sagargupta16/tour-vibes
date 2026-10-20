@@ -147,7 +147,7 @@ export default function ProfileForm({ user, onUpdate }) {
                      className="flex items-center gap-2 text-xs text-muted-foreground sm:mr-auto"
                   >
                      <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-                     Unsaved changes
+                     <span>Unsaved changes</span>
                   </motion.span>
                )}
             </AnimatePresence>

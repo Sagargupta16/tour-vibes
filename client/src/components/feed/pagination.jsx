@@ -10,7 +10,8 @@ const pageList = (page, lastPage) => {
    const pages = [];
    for (let p = 1; p <= lastPage; p++) {
       if (p === 1 || p === lastPage || Math.abs(p - page) <= 1) pages.push(p);
-      else if (pages.at(-1) !== 'gap') pages.push('gap');
+      // A gap is keyed by the first page it hides, so React keys stay stable
+      else if (typeof pages.at(-1) !== 'string') pages.push(`gap-${p}`);
    }
    return pages;
 };
@@ -34,9 +35,9 @@ export default function Pagination({ page, lastPage, onPageChange }) {
          </Button>
 
          <ol className="hidden items-center gap-1 sm:flex">
-            {pageList(page, lastPage).map((p, i) =>
-               p === 'gap' ? (
-                  <li key={`gap-${i}`} aria-hidden className="grid w-6 place-items-center">
+            {pageList(page, lastPage).map((p) =>
+               typeof p === 'string' ? (
+                  <li key={p} aria-hidden className="grid w-6 place-items-center">
                      <MoreHorizontal className="size-4 text-muted-foreground" />
                   </li>
                ) : (

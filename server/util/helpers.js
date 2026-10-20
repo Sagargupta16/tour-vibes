@@ -84,6 +84,25 @@ const parseCoordinates = (body) => {
    return { lat: Number(lat), lng: Number(lng) };
 };
 
+// The edit form's fields onto a post. An empty field clears the value; a field that
+// was not sent keeps it. parseTags throws the 422 for bad tags.
+const applyPostEdits = (post, body) => {
+   post.title = body.title;
+   post.content = body.content;
+   if (body.tags) post.tags = parseTags(body.tags);
+   if (body.locationName !== undefined) post.location.name = body.locationName;
+   if (body.locationCountry !== undefined) post.location.country = body.locationCountry;
+   // undefined: pin not sent, keep it; null: pin removed; object: pin moved
+   const coords = parseCoordinates(body);
+   if (coords !== undefined) {
+      post.location.lat = coords?.lat;
+      post.location.lng = coords?.lng;
+   }
+   if (body.travelDate !== undefined) {
+      post.travelDate = body.travelDate ? new Date(body.travelDate) : undefined;
+   }
+};
+
 module.exports = {
    PER_PAGE,
    parsePage,
@@ -92,5 +111,6 @@ module.exports = {
    discardUpload,
    getSortOption,
    parseTags,
-   parseCoordinates
+   parseCoordinates,
+   applyPostEdits
 };

@@ -23,8 +23,10 @@ export default function TagInput({ id, value, onChange }) {
    const remove = (tag) => onChange(value.filter((t) => t !== tag));
 
    return (
-      // A click anywhere in the box focuses the text field, like a native input
+      // A click anywhere in the box focuses the text field, like a native input. The box
+      // itself is presentational: keyboard users reach the input directly
       <div
+         role="presentation"
          onClick={() => inputRef.current?.focus()}
          className="relative flex min-h-11 flex-wrap items-center gap-1.5 rounded-lg border border-input px-2 py-1.5 transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30"
       >

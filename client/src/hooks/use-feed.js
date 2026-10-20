@@ -56,7 +56,7 @@ export default function useFeed({
             settle({ posts: [], totalPosts: 0, error: err.message || 'Could not load journals' });
          }
       };
-      load();
+      void load();
       return () => controller.abort();
    }, [path, requestKey, userId, searchQuery, tag]);
 

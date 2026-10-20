@@ -14,7 +14,7 @@ const toBase64Url = (value) =>
    btoa(String.fromCodePoint(...encoder.encode(value)))
       .replaceAll('+', '-')
       .replaceAll('/', '_')
-      .replace(/=+$/, '');
+      .replaceAll('=', '');
 
 const fromBase64Url = (part) =>
    new TextDecoder().decode(
@@ -31,7 +31,8 @@ export async function signToken(user, secret, now) {
    const body = toBase64Url(
       JSON.stringify({ email: user.email, userId: user._id, iat, exp: iat + HOUR_S })
    );
-   return `${head}.${body}.${await sign(`${head}.${body}`, secret)}`;
+   const data = `${head}.${body}`;
+   return `${data}.${await sign(data, secret)}`;
 }
 
 // The jsonwebtoken errors the server's is-auth middleware answers with a 401
@@ -48,6 +49,8 @@ export async function verifyToken(token, secret, now) {
    } catch {
       throw httpError(401, 'jwt malformed');
    }
-   if (!(payload.exp * 1000 > now)) throw httpError(401, 'jwt expired');
+   // A missing or non-numeric exp gives NaN and counts as expired
+   const expiresAt = payload.exp * 1000;
+   if (Number.isNaN(expiresAt) || expiresAt <= now) throw httpError(401, 'jwt expired');
    return payload.userId;
 }

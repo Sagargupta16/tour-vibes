@@ -86,7 +86,7 @@ export default function Login() {
                   className="my-6 flex items-center gap-3 font-mono text-[11px] tracking-[0.14em] text-muted-foreground uppercase"
                >
                   <span className="h-px flex-1 bg-border" />
-                  or use your email
+                  <span>or use your email</span>
                   <span className="h-px flex-1 bg-border" />
                </motion.div>
             </>

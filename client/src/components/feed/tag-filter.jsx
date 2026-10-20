@@ -20,7 +20,7 @@ export default function TagFilter({ activeTag, onTagChange }) {
             // Chips are optional; the feed still works without them
          }
       };
-      load();
+      void load();
       return () => controller.abort();
    }, []);
 
@@ -38,11 +38,10 @@ export default function TagFilter({ activeTag, onTagChange }) {
    if (chips.length === 0) return null;
 
    return (
-      <div
+      <fieldset
          ref={rowRef}
-         role="group"
          aria-label="Filter by tag"
-         className="relative -mx-4 flex gap-2 tv-no-scrollbar overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+         className="relative -mx-4 flex min-w-0 gap-2 tv-no-scrollbar overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
       >
          {['', ...chips].map((tag) => {
             const active = tag === activeTag;
@@ -71,6 +70,6 @@ export default function TagFilter({ activeTag, onTagChange }) {
                </motion.button>
             );
          })}
-      </div>
+      </fieldset>
    );
 }

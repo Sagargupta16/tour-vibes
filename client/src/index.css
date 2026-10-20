@@ -43,7 +43,7 @@
    /* Same curves as lib/motion.js, so CSS and Framer Motion move alike */
    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-   /* animate-shimmer: skeleton sweep; animate-marquee: endless row (duplicate the items once) */
+   /* The skeleton sweep and an endless marquee row (render the marquee items twice) */
    --animate-shimmer: tv-shimmer 1.6s var(--ease-in-out) infinite;
    --animate-marquee: tv-marquee 40s linear infinite;
 }

@@ -22,7 +22,7 @@ export default function useFeaturedPosts() {
             setState({ posts: [], total: 0, status: 'error' });
          }
       };
-      load();
+      void load();
       return () => controller.abort();
    }, []);
 
