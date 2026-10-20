@@ -11,9 +11,8 @@ const authRoutes = require('./routes/auth');
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use('/images', express.static(path.join(__dirname, 'images')));
-
+// CORS first, so even a body-parser error (bad JSON, 413) carries the headers the browser needs
+// to read it
 app.use(
    cors({
       origin: process.env.CLIENT_URL || 'http://localhost:3000',
@@ -22,12 +21,26 @@ app.use(
    })
 );
 
+app.use(bodyParser.json());
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes);
 
+// Multer rejections other than the size limit (unexpected field, too many parts) are the
+// client's fault, not a 500
+const statusFor = (error) => {
+   if (error.statusCode) return error.statusCode;
+   if (error.code === 'LIMIT_FILE_SIZE') return 413;
+   return error.name === 'MulterError' ? 400 : 500;
+};
+
 app.use((error, req, res, next) => {
-   const statusCode = error.statusCode || (error.code === 'LIMIT_FILE_SIZE' ? 413 : 500);
-   const message = error.message;
+   const statusCode = statusFor(error);
+   // A 5xx message can carry driver or stack detail (duplicate-key text, cast errors):
+   // log it, send a generic one
+   if (statusCode >= 500) console.error(error);
+   const message = statusCode >= 500 ? 'Something went wrong' : error.message;
    const data = error.data;
    res.status(statusCode).json({ message, data });
 });
@@ -43,7 +56,12 @@ const start = async () => {
    try {
       await mongoose.connect(MONGODB_URI);
       console.log('Connected to MongoDB');
-      app.listen(PORT, () => {
+      app.listen(PORT, (err) => {
+         // Express 5 hands listen errors (EADDRINUSE) to this callback
+         if (err) {
+            console.error('Server failed to start:', err);
+            process.exit(1);
+         }
          console.log(`Server is running on port ${PORT}`);
       });
    } catch (err) {

@@ -2,10 +2,14 @@ const fs = require('fs');
 const path = require('path');
 
 const PER_PAGE = 10;
+// Past this the skip() would overflow what Mongo accepts and turn into a 500
+const MAX_PAGE = 100000;
+const MAX_TAGS = 20;
+const MAX_TAG_LENGTH = 40;
 
 const parsePage = (raw) => {
    const page = parseInt(raw, 10);
-   return Number.isFinite(page) && page > 0 ? page : 1;
+   return Number.isFinite(page) && page > 0 ? Math.min(page, MAX_PAGE) : 1;
 };
 
 const normalizePath = (filePath) => {
@@ -16,10 +20,17 @@ const clearImage = (filePath) => {
    if (!filePath) return;
    const resolved = path.resolve(__dirname, '..', filePath);
    const imagesDir = path.resolve(__dirname, '..', 'images');
-   if (!resolved.startsWith(imagesDir)) return;
+   // The separator matters: a bare startsWith also let a sibling like images-old/ through
+   if (!resolved.startsWith(imagesDir + path.sep)) return;
    fs.unlink(resolved, (err) => {
       if (err && err.code !== 'ENOENT') console.error('Failed to delete image:', err);
    });
+};
+
+// multer writes the upload before validation and ownership checks run, so every
+// failed request that carried a file has to remove it again or it is orphaned.
+const discardUpload = (req) => {
+   if (req.file) clearImage(normalizePath(req.file.path));
 };
 
 // Popularity sorting is handled separately in getPosts via aggregation
@@ -44,8 +55,14 @@ const parseTags = (raw) => {
       error.statusCode = 422;
       throw error;
    }
-   if (!Array.isArray(parsed)) {
-      const error = new Error('Tags must be a valid JSON array');
+   const valid =
+      Array.isArray(parsed) &&
+      parsed.length <= MAX_TAGS &&
+      parsed.every((tag) => typeof tag === 'string' && tag.length <= MAX_TAG_LENGTH);
+   if (!valid) {
+      const error = new Error(
+         `Tags must be a JSON array of up to ${MAX_TAGS} strings of ${MAX_TAG_LENGTH} characters`
+      );
       error.statusCode = 422;
       throw error;
    }
@@ -72,6 +89,7 @@ module.exports = {
    parsePage,
    normalizePath,
    clearImage,
+   discardUpload,
    getSortOption,
    parseTags,
    parseCoordinates

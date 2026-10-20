@@ -29,6 +29,7 @@ coverage/
 *.swo
 .cursor/
 .claude/
+.scratch/
 
 # OS generated files
 .DS_Store

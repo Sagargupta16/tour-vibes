@@ -1,9 +1,11 @@
 import 'leaflet/dist/leaflet.css';
+import './map.css';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { cn } from '@/lib/utils';
 
 // Shared map shell: OpenStreetMap tiles with the required attribution. The
-// `isolate` class keeps Leaflet's own z-indexes below the sticky header.
+// `isolate` class keeps Leaflet's own z-indexes below the sticky header. Every
+// other prop (ref included) goes to MapContainer.
 export default function MapBase({ className, children, ...props }) {
    return (
       <MapContainer

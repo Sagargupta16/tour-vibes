@@ -12,6 +12,7 @@ const Feed = lazy(() => import('@/pages/feed'));
 const MyJournals = lazy(() => import('@/pages/my-journals'));
 const SinglePost = lazy(() => import('@/pages/single-post'));
 const MapPage = lazy(() => import('@/pages/map'));
+const Traveler = lazy(() => import('@/pages/traveler'));
 const Profile = lazy(() => import('@/pages/profile'));
 const NotFound = lazy(() => import('@/pages/not-found'));
 
@@ -22,11 +23,13 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            {/* Browsing is open to everyone; only writing needs an account */}
+            <Route path="/journals" element={<Feed />} />
+            <Route path="/journals/:postId" element={<SinglePost />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/travelers/:userId" element={<Traveler />} />
             <Route element={<ProtectedRoute />}>
-               <Route path="/journals" element={<Feed />} />
-               <Route path="/journals/:postId" element={<SinglePost />} />
                <Route path="/myjournals" element={<MyJournals />} />
-               <Route path="/map" element={<MapPage />} />
                <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />

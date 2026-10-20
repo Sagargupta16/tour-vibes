@@ -23,8 +23,12 @@ export default defineConfig([
       },
     },
     rules: {
-      // core no-unused-vars does not see JSX member use like <motion.div>
-      'no-unused-vars': ['error', { varsIgnorePattern: '^(?:[A-Z_]|motion$)' }],
+      // core no-unused-vars does not see JSX use like <motion.div>, or a component
+      // renamed while destructuring a param ({ icon: Icon }) and rendered as <Icon />
+      'no-unused-vars': [
+        'error',
+        { varsIgnorePattern: '^(?:[A-Z_]|motion$)', argsIgnorePattern: '^[A-Z_]' },
+      ],
     },
   },
   {

@@ -141,11 +141,12 @@ test('every API route is rate limited', async () => {
    assert.equal(login.headers['x-ratelimit-limit'], '20');
 });
 
-test('a tampered or missing token is a 401', async () => {
-   const missing = await request(app).get('/feed/posts');
+test('a tampered or missing token is a 401 on a write route', async () => {
+   const missing = await request(app).put('/auth/password').send({});
    const tampered = await request(app)
-      .get('/feed/posts')
-      .set('Authorization', 'Bearer abc.def.ghi');
+      .put('/auth/password')
+      .set('Authorization', 'Bearer abc.def.ghi')
+      .send({});
    assert.equal(missing.status, 401);
    assert.equal(tampered.status, 401);
 });

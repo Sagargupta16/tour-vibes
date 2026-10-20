@@ -1,0 +1,91 @@
+/* Map extras on top of index.css's .tv-map / .tv-pin theming (which owns the pin
+   drop): the active pin, the locate dot and the photo popup card. Imported by
+   map-base.jsx, so it ships in the map chunk. */
+
+/* The journal picked in the list or on the map: ink instead of accent, lifted */
+.tv-map .tv-pin.is-active {
+   color: var(--foreground);
+}
+
+.tv-map .tv-pin.is-active svg {
+   transform: translateY(-4px) scale(1.25);
+}
+
+/* "You are here" from the locate control */
+.tv-me-dot,
+.tv-me-ring {
+   position: absolute;
+   inset: 0;
+   border-radius: 9999px;
+}
+
+.tv-me-dot {
+   background: var(--primary);
+   border: 3px solid #fff;
+   box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.tv-me-ring {
+   border: 2px solid var(--primary);
+   animation: tv-me-pulse 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes tv-me-pulse {
+   from {
+      transform: scale(1);
+      opacity: 0.8;
+   }
+   to {
+      transform: scale(3.2);
+      opacity: 0;
+   }
+}
+
+/* Popup as a flat bordered card: photo flush to the edges, content below */
+.tv-map .tv-popup .leaflet-popup-content-wrapper {
+   padding: 0;
+   overflow: hidden;
+}
+
+.tv-map .tv-popup .leaflet-popup-content {
+   margin: 0;
+   line-height: 1.4;
+}
+
+/* Rises into place as Leaflet fades it in */
+.tv-map .tv-popup .leaflet-popup-content-wrapper,
+.tv-map .tv-popup .leaflet-popup-tip-container {
+   animation: tv-popup-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tv-popup-in {
+   from {
+      transform: translateY(10px);
+   }
+   to {
+      transform: none;
+   }
+}
+
+.tv-map .tv-popup a.leaflet-popup-close-button {
+   top: 8px;
+   right: 8px;
+   width: 30px;
+   height: 30px;
+   border-radius: 9999px;
+   background: rgb(0 0 0 / 0.5);
+   color: #fff;
+   font: 18px/30px var(--font-sans);
+   transition:
+      background-color 150ms ease-out,
+      scale 150ms ease-out;
+}
+
+.tv-map .tv-popup a.leaflet-popup-close-button:hover {
+   background: rgb(0 0 0 / 0.72);
+   color: #fff;
+}
+
+.tv-map .tv-popup a.leaflet-popup-close-button:active {
+   scale: 0.92;
+}

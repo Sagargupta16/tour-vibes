@@ -1,0 +1,132 @@
+/* Shared tv-* utilities. Use them like any Tailwind class: className="tv-eyebrow". */
+
+/* Page width container: <div className="tv-container"> */
+@utility tv-container {
+   width: 100%;
+   max-width: 72rem;
+   margin-inline: auto;
+   padding-inline: 1rem;
+
+   @media (width >= 40rem) {
+      padding-inline: 1.5rem;
+   }
+}
+
+/* Small mono label above a heading or for metadata (dates, coordinates) */
+@utility tv-eyebrow {
+   font-family: var(--font-mono);
+   font-size: 0.6875rem;
+   font-weight: 500;
+   line-height: 1rem;
+   letter-spacing: 0.14em;
+   text-transform: uppercase;
+   color: var(--muted-foreground);
+}
+
+/* Text link with an underline that grows from the left on hover */
+@utility tv-link {
+   position: relative;
+   text-decoration: none;
+
+   &::after {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      bottom: -2px;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 250ms var(--ease-out);
+   }
+
+   &:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+   }
+}
+
+/* Clickable card: lifts and takes an accent border on hover, presses in on tap */
+@utility tv-card-interactive {
+   transition:
+      transform 250ms var(--ease-out),
+      border-color 200ms var(--ease-out);
+
+   &:hover {
+      transform: translateY(-3px);
+      border-color: color-mix(in oklch, var(--primary) 45%, var(--border));
+   }
+
+   &:active {
+      transform: translateY(-1px) scale(0.99);
+   }
+}
+
+/* Tactile press for custom buttons (shadcn Button already has it) */
+@utility tv-press {
+   transition: transform 150ms var(--ease-out);
+
+   &:active {
+      transform: scale(0.96);
+   }
+}
+
+/* Grows the tap area of a small control to at least 44px without moving layout */
+@utility tv-hit {
+   position: relative;
+
+   &::before {
+      content: '';
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+   }
+}
+
+/* Hairline inside an image edge so photos never bleed into the card */
+@utility tv-img-outline {
+   outline: 1px solid rgb(0 0 0 / 0.1);
+   outline-offset: -1px;
+
+   &:where(.dark *) {
+      outline-color: rgb(255 255 255 / 0.1);
+   }
+}
+
+/* Dotted map-paper texture for empty panels and hero backdrops */
+@utility tv-dot-grid {
+   background-image: radial-gradient(
+      color-mix(in oklch, var(--muted-foreground) 28%, transparent) 1px,
+      transparent 1.2px
+   );
+   background-size: 18px 18px;
+}
+
+/* Horizontal scrollers (snap carousels) without a visible scrollbar */
+@utility tv-no-scrollbar {
+   scrollbar-width: none;
+
+   &::-webkit-scrollbar {
+      display: none;
+   }
+}
+
+@keyframes tv-shimmer {
+   from {
+      transform: translateX(-100%);
+   }
+   to {
+      transform: translateX(100%);
+   }
+}
+
+@keyframes tv-marquee {
+   from {
+      transform: translateX(0);
+   }
+   to {
+      transform: translateX(-50%);
+   }
+}

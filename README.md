@@ -8,19 +8,21 @@
 
 A full-stack travel journal web application built with the MERN stack. Share travel experiences, photos, and adventures with a community of fellow travelers.
 
-> Note: This is a sample/reference project -- it is not actively deployed. `docker compose up --build` runs the whole stack locally, and `npm run seed` fills it with demo journals.
+**Live demo: [sagargupta.online/tour-vibes](https://sagargupta.online/tour-vibes/)** -- the whole app on GitHub Pages with an in-browser mock of the API, so there is no server behind it: browse without an account, then tap **Explore the live demo** to post, like and comment. What you add stays in your browser. `docker compose up --build` runs the real stack locally, and `npm run seed` fills it with the same demo journals.
 
-Started in March 2023 and since rebuilt end to end: React 19 + Vite 8 on the front, an Express 5 REST API on Mongoose 9 at the back, JWT auth, image uploads, likes, comments, tags, full-text search and a map of every pinned journal. The backend checks ownership before every post edit or delete and every comment delete, rate-limits every API route, and accepts uploads only after authentication. 32 API tests run against an in-memory MongoDB on every push.
+Started in March 2023 and since rebuilt end to end: React 19 + Vite 8 on the front, an Express 5 REST API on Mongoose 9 at the back, JWT auth, image uploads, likes, comments, tags, full-text search, traveler pages and a map of every pinned journal. Anyone can read; the backend checks ownership before every post edit or delete and every comment delete, rate-limits every API route, and accepts uploads only after authentication. 52 API tests run against an in-memory MongoDB on every push.
 
 ## Screenshots
 
-Captured with Playwright from a local run seeded with `npm run seed`.
+Captured from the live demo build (`npm run build:demo`) with its seeded journals.
 
-| Community feed                                                                                 | Journal map                                                                                       |
-| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| ![Community feed with photo cards, tag filters and search](docs/screenshots/desktop-feed.webp) | ![World map with a marker per journal and a photo popup](docs/screenshots/desktop-map-popup.webp) |
-| **Pin picker in the post form**                                                                | **Map in dark mode**                                                                              |
-| ![New journal form with a map pin found for Kyoto, Japan](docs/screenshots/desktop-form.webp)  | ![The journal map with dark tiles](docs/screenshots/desktop-map-dark.webp)                        |
+![Landing page: the headline over a dotted world map with the most-liked journals pinned](docs/screenshots/desktop-home.webp)
+
+| Community feed                                                                                 | Journal map                                                                                                     |
+| ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| ![Community feed with photo cards, tag filters and search](docs/screenshots/desktop-feed.webp) | ![World map with a pin per journal and a list of the journals in view](docs/screenshots/desktop-map-popup.webp) |
+| **Pin picker in the post form**                                                                | **Map in dark mode**                                                                                            |
+| ![New journal form with a map pin found for Kyoto, Japan](docs/screenshots/desktop-form.webp)  | ![The journal map with dark tiles](docs/screenshots/desktop-map-dark.webp)                                      |
 
 <p align="center">
   <img src="docs/screenshots/phone-feed.webp" alt="Feed on a phone" width="250" />
@@ -30,20 +32,23 @@ Captured with Playwright from a local run seeded with `npm run seed`.
 
 ## Features
 
-- **Authentication** -- signup, login, JWT tokens with 1-hour expiry, auto-logout
-- **User Profiles** -- bio, avatar, location, password change
-- **Travel Posts** -- create, edit, delete with image uploads, tags, location, and travel date
-- **Journal Map** -- every pinned journal on an OpenStreetMap map; panning or zooming loads only the journals in view
-- **Map Pin Picker** -- tap the map to pin a journal, drag to adjust, or look the city up through Nominatim
+- **Public Browsing** -- the feed, journals, the map, search and traveler pages work without an account; posting, liking and commenting ask you to sign in and bring you back
+- **Authentication** -- signup (signs you straight in), login, JWT tokens with 1-hour expiry, auto-logout, sign-in and sign-out synced across tabs
+- **User Profiles** -- bio, avatar with instant upload, home base, password change with a strength meter
+- **Traveler Pages** -- `/travelers/:userId` with a traveler's journals, a map of their pins and journal, place and like totals
+- **Travel Posts** -- create, edit, delete with drag-and-drop photos, tag chips, location and travel date
+- **Journal Map** -- every pinned journal on an OpenStreetMap map with a list of the journals in view; panning or zooming loads only those, and a list card flies the map to its pin
+- **Map Pin Picker** -- tap the map to pin a journal, drag to adjust, use your location, or look the city up through Nominatim
+- **Live Demo** -- `npm run build:demo` builds the app with an in-browser mock API for GitHub Pages; `npm run dev:demo` runs it locally with no server or database
 - **Demo Data** -- `npm run seed` loads 5 demo users and 19 pinned journals with photos, likes and comments
-- **Likes and Comments** -- like/unlike posts, comment threads with delete
-- **Community Feed** -- all posts with pagination, sort by newest/oldest/popular, filter by tag
-- **Personal Feed** -- view your own posts
+- **Likes and Comments** -- optimistic likes with rollback, comment threads with delete
+- **Community Feed** -- pagination, sort by newest/oldest/popular, filter by tag, with every filter in the URL so a view can be shared
+- **Personal Feed** -- your own journals with journal, place and like totals
 - **Search** -- full-text search across titles, content, and tags
 - **Rate Limiting** -- every API route is rate-limited; login, signup and password change get a tighter limit
-- **Responsive Design** -- mobile-friendly with hamburger navigation
-- **Dark/Light Mode** -- system-aware theme with manual toggle
-- **Animations** -- page transitions, hover effects, scroll animations (Framer Motion)
+- **Responsive Design** -- built for phones first: sticky filters, 44px touch targets, a card rail under the map
+- **Dark/Light Mode** -- system-aware theme with manual toggle, applied before first paint
+- **Animations** -- page transitions, staggered reveals, a sliding nav pill, heart bursts, pins that drop in (Framer Motion, shared tokens in `src/lib/motion.js`)
 - **Toast Notifications** -- feedback on every user action
 - **Skeleton Loading** -- content-shaped placeholders while loading
 
@@ -53,8 +58,9 @@ Captured with Playwright from a local run seeded with `npm run seed`.
 flowchart LR
     U[Browser / phone] --> C[React 19 SPA<br/>Vite 8, Tailwind 4, shadcn/ui]
     C -- "fetch + Bearer JWT" --> RL
+    C -. "static demo build" .-> MOCK[In-browser mock API<br/>localStorage + IndexedDB]
     subgraph API[Express 5 API]
-        RL[express-rate-limit] --> AUTH[is-auth JWT check]
+        RL[express-rate-limit] --> AUTH[is-auth / optional-auth JWT check]
         AUTH --> UP[multer upload<br/>PNG/JPG, 5MB]
         UP --> V[express-validator]
         V --> CTRL[controllers<br/>auth, feed, comment]
@@ -66,7 +72,7 @@ flowchart LR
     C -- "Find city (on click)" --> NOM[Nominatim geocoder]
 ```
 
-A request goes through the same layers in the same order: rate limit, JWT check, upload (only on the three routes that take a file), validation, then the controller. Because the upload runs after the JWT check, an anonymous request can never write to disk.
+A request goes through the same layers in the same order: rate limit, JWT check, upload (only on the three routes that take a file), validation, then the controller. Reads use optional auth: no token is fine, a bad or expired one is still a 401. Because the upload runs after the JWT check, an anonymous request can never write to disk. The GitHub Pages build swaps `fetch` for a mock of the same routes that runs in the browser.
 
 ### Design decisions
 
@@ -82,18 +88,32 @@ A request goes through the same layers in the same order: rate limit, JWT check,
 | The map refetches on pan or zoom and aborts the previous request  | Only pins in view travel over the wire (capped at 500), and a slow old response cannot replace newer markers    |
 | `router.param` checks every `:postId`, `:commentId`, `:userId`    | A malformed id is a 400 before any query runs, instead of a Mongoose CastError surfacing as a 500               |
 | Every page but Home is `React.lazy`, vendors in their own chunks  | Leaflet (153 kB) loads only with a map, and an app deploy does not bust the cached React chunk                  |
+| Reads are public, writes need a token (`optional-auth` on GETs)   | A travel journal is meant to be read; a stale token on a read is still a 401, so the client signs out           |
+| The live demo is a static build with a mock of the API            | A working demo on Pages with no server or database to run; the mock keeps the server's shapes and status codes  |
+| Session keys in localStorage are prefixed `tour-vibes:`           | The demo shares sagargupta.online with other apps, whose bare `token` must not sign anyone in or out here       |
 
 ## Tech Stack
 
-**Frontend:** Vite 8, React 19, Tailwind CSS 4, shadcn/ui, Framer Motion, Sonner
+**Frontend:** Vite 8, React 19, Tailwind CSS 4, shadcn/ui on Base UI, Framer Motion, Sonner, Inter and Schibsted Grotesk (self-hosted via Fontsource)
 **Backend:** Express 5, Mongoose 9, MongoDB Atlas
 **Auth:** JWT + bcryptjs
 **Uploads:** Multer (local disk, 5MB limit, PNG/JPG only)
 **Maps:** Leaflet + react-leaflet, OpenStreetMap tiles, Nominatim geocoding
 **Testing:** node:test, supertest, mongodb-memory-server
-**Tooling:** ESLint 9, Prettier, Concurrently, Nodemon, Docker Compose, Renovate, GitHub Actions CI (lint, build, tests, format check, Docker smoke test), CodeQL
+**Tooling:** ESLint 9, Prettier, Concurrently, `node --watch`, Docker Compose, Renovate, GitHub Actions CI (lint, build, tests, format check, Docker smoke test) and Pages deploy, CodeQL
 
 ## Quick Start
+
+### Live demo without a server
+
+```bash
+git clone https://github.com/Sagargupta16/tour-vibes.git
+cd tour-vibes/client
+npm install
+npm run dev:demo
+```
+
+Open http://localhost:3000/tour-vibes/. This is the build that runs on GitHub Pages: the mock API in `client/src/lib/demo/` answers every request from the seed data in `server/seed/`, and anything you add stays in the browser until you press **Reset demo data**.
 
 ### With Docker (one command)
 
@@ -142,7 +162,7 @@ Frontend runs on http://localhost:3000, backend on http://localhost:8000. For de
 | `npm run format`       | Format all JS/CSS with Prettier            |
 | `npm run format:check` | Check formatting without writing           |
 
-In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journals. In `client/`: `npm run bundle:report` prints the JS chunk sizes after `npm run build`.
+In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journals, `npm run dev` restarts on change with `node --watch`. In `client/`: `npm run dev:demo` and `npm run build:demo` run and build the serverless demo (base path `/tour-vibes/`), and `npm run bundle:report` prints the JS chunk sizes after `npm run build`.
 
 ## Environment Variables
 
@@ -159,6 +179,8 @@ In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journ
 
 ## API Endpoints
 
+Every `GET` is public (a token is optional, a bad one is a 401); every other method needs `Authorization: Bearer <token>`, except signup, login and the demo login.
+
 ### Auth (`/auth`)
 
 | Method | Endpoint        | Description                                  |
@@ -169,7 +191,7 @@ In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journ
 | GET    | `/profile`      | Get own profile                              |
 | PUT    | `/profile`      | Update profile (name, bio, location, avatar) |
 | PUT    | `/password`     | Change password (rate-limited)               |
-| GET    | `/user/:userId` | View public profile                          |
+| GET    | `/user/:userId` | Public profile, no email (public)            |
 
 ### Feed (`/feed`)
 
@@ -191,11 +213,13 @@ In `server/`: `npm test` runs the API tests, `npm run seed` loads the demo journ
 
 ## Testing
 
-`npm test` in `server/` runs 32 tests with `node:test` and supertest against the real Express app and an in-memory MongoDB (mongodb-memory-server). CI runs them on every push. They cover:
+`npm test` in `server/` runs 52 tests with `node:test` and supertest against the real Express app and an in-memory MongoDB (mongodb-memory-server). CI runs them on every push. They cover:
 
 - Security regressions: anonymous uploads never touch disk, a user cannot hijack and delete another user's image, cross-user edit and delete are 403, one login error for unknown email and wrong password, a NoSQL operator in place of the email is rejected, a wrong current password is a 422 that keeps the session, uploads over 5MB are a 413, a malformed id is a 400, every route sends rate-limit headers, the demo login is off without `DEMO_EMAIL`
 - Feed behaviour: create with tags and pin, validation, newest/oldest/popular sorts, tag filter, pagination, text search, likes, comments, delete cascade
-- The map query: bounding boxes, a box across the antimeridian, world-wide boxes, malformed `bbox`
+- The map query: bounding boxes, a box across the antimeridian, world-wide boxes, malformed or blank `bbox`
+- Public reads: every public route answers anonymously, every write is a 401 without a token, a garbage or expired token is a 401 even on a public read, and the public profile has no email
+- Hardening regressions: a mixed-case duplicate signup, repeated `?tag=`, huge page numbers, uploads left behind by failed requests, double-counted concurrent likes, clearing a location or travel date, and the new length limits
 
 ## Bundle size
 
@@ -210,26 +234,34 @@ Measured with `npm run bundle:report` (raw and gzip sizes, kB = 1000 bytes). Bef
 
 The first paint is smaller even though the app gained a whole map stack: Leaflet and react-leaflet (153.29 kB raw) load only on the map page, a pinned journal or the post form. The build no longer warns about chunks over 500 kB.
 
+v0.9.0 adds the new landing page, the design system and the self-hosted display font: first paint is now 649.81 kB raw (208.39 kB gzip) across 43 chunks, the largest 236.29 kB. The demo's mock API and banner are separate chunks that only the `build:demo` output contains.
+
 ## Project Structure
 
 ```
 tour-vibes/
 ├── client/src/
 │   ├── components/ui/    # shadcn/ui primitives
-│   ├── components/layout/# Header, mobile nav, root layout
-│   ├── components/feed/  # Post card, post form, search, tags, sort
-│   ├── components/post/  # Like button, comments
-│   ├── components/profile/# Profile + password forms
-│   ├── components/map/   # Leaflet map shell, pin icon, pin picker, post map
+│   ├── components/layout/# Header, mobile nav, user menu, theme toggle, footer, root layout
+│   ├── components/home/  # Landing page sections: hero map, most loved, how it works, map teaser
+│   ├── components/auth/  # Auth shell and visual, form fields, demo login, route guard
+│   ├── components/feed/  # Post card and grid, post form, search, tags, sort, pagination
+│   ├── components/post/  # Hero, lightbox, like button, share, comments
+│   ├── components/profile/# Profile header, avatar upload, profile + password forms
+│   ├── components/traveler/# Traveler page header, stats, map
+│   ├── components/map/   # Leaflet map shell, pins, popup, controls, list, pin picker
 │   ├── components/shared/# Page transitions, skeletons, empty state, page loader
+│   ├── components/demo/  # Live demo banner
 │   ├── contexts/         # Auth + Theme providers
 │   ├── hooks/            # useFeed, useMapPosts, useDebounce
-│   ├── lib/              # API client, geocoder, validators, utils
-│   └── pages/            # Home, Login, Signup, Feed, My Journals, Single Post, Map, Profile, 404
-├── client/scripts/       # bundle-report.mjs
+│   ├── lib/              # API client, session keys, motion tokens, geocoder, validators
+│   ├── lib/demo/         # In-browser mock API for the Pages build
+│   ├── styles/           # Utility classes and Leaflet theming
+│   └── pages/            # Home, Login, Signup, Feed, My Journals, Single Post, Map, Traveler, Profile, 404
+├── client/scripts/       # bundle-report, prepare-demo, pages-fallback
 ├── server/
 │   ├── controllers/      # Route handlers (auth, feed, like, map, comment)
-│   ├── middleware/       # JWT auth, multer upload, ObjectId check
+│   ├── middleware/       # JWT auth, optional auth, multer upload, ObjectId check
 │   ├── models/           # Mongoose schemas (User, Post, Comment)
 │   ├── routes/           # Express route definitions
 │   ├── util/             # Shared helpers
@@ -255,7 +287,7 @@ tour-vibes/
 
 | Project                                                                                | Description                                                            |
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| [claude-cost-optimizer](https://github.com/Sagargupta16/claude-cost-optimizer)         | Save 30-60% on Claude Code costs - proven strategies and benchmarks    |
+| [claude-cost-optimizer](https://github.com/Sagargupta16/claude-cost-optimizer)         | Cut Claude Code costs with sourced levers, a skill and CLI tools       |
 | [Financial Dashboard](https://github.com/Sagargupta16/Financial-Dashboard)             | Modern React financial dashboard with analytics and data visualization |
 | [InstagramLikesLeaderboard](https://github.com/Sagargupta16/InstagramLikesLeaderboard) | Browser tool showing who likes your Instagram posts the most           |
 | [LeetCode Rating Predictor](https://github.com/Sagargupta16/LeetCode_Rating_Predictor) | Full-stack ML-powered LeetCode contest rating predictor                |

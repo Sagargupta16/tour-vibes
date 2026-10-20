@@ -1,0 +1,81 @@
+/* Leaflet maps (map page, post form picker, single journal) */
+
+@keyframes tv-pin-drop {
+   0% {
+      opacity: 0;
+      transform: translateY(-16px) scale(0.6);
+   }
+   60% {
+      opacity: 1;
+      transform: translateY(0) scale(1.08);
+   }
+   100% {
+      transform: translateY(0) scale(1);
+   }
+}
+
+.tv-map {
+   background: var(--muted);
+   font-family: var(--font-sans);
+}
+
+/* Leaflet positions the icon element with its own transform, so the drop-in and
+   the hover lift go on the inner svg. `backwards` hands the transform back to
+   the hover rule once the drop has played. */
+.tv-pin {
+   color: var(--primary);
+   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.3));
+}
+
+.tv-pin svg {
+   transform-origin: 50% 100%;
+   transition: transform 150ms var(--ease-out);
+   animation: tv-pin-drop 450ms var(--ease-out) backwards;
+}
+
+.tv-pin:hover svg {
+   transform: translateY(-3px) scale(1.12);
+}
+
+.tv-map .leaflet-popup-content-wrapper,
+.tv-map .leaflet-popup-tip {
+   background: var(--popover);
+   color: var(--popover-foreground);
+}
+
+.tv-map .leaflet-popup-content-wrapper {
+   border: 1px solid var(--border);
+   border-radius: var(--radius-xl);
+   box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.35);
+}
+
+.tv-map .leaflet-popup-content {
+   margin: 10px;
+}
+
+/* Leaflet colours every link blue; the popup card keeps the theme text colour */
+.tv-map .leaflet-popup-content a {
+   color: inherit;
+}
+
+.tv-map .leaflet-bar a {
+   transition: background-color 150ms var(--ease-out);
+}
+
+/* OSM has no dark tiles; invert the light ones and rotate hue back. Per tile, not on
+   the whole tile pane: a pane-wide filter left hairline seams between tile rows on
+   high-DPI phones */
+.dark .tv-map .leaflet-tile {
+   filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+
+.dark .tv-map .leaflet-bar a,
+.dark .tv-map .leaflet-control-attribution {
+   background: var(--card);
+   color: var(--card-foreground);
+   border-color: var(--border);
+}
+
+.dark .tv-map .leaflet-control-attribution a {
+   color: var(--muted-foreground);
+}
