@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Camera, LoaderCircle } from 'lucide-react';
 import { api, imageUrl } from '@/lib/api';
+import { readAsDataUrl } from '@/lib/read-file';
 import { cn } from '@/lib/utils';
 import { duration, ease } from '@/lib/motion';
 import { initials } from './profile-utils';
@@ -15,16 +16,9 @@ const MAX_BYTES = 5 * 1024 * 1024;
 // while it saves, and back to the old photo if the server says no
 export default function AvatarUpload({ name, avatar, onUploaded }) {
    const inputRef = useRef(null);
-   // Object URL of the picked file; kept after the save so the photo never flickers
+   // Data URL of the picked file; kept after the save so the photo never flickers
    const [preview, setPreview] = useState(null);
    const [uploading, setUploading] = useState(false);
-
-   useEffect(
-      () => () => {
-         if (preview) URL.revokeObjectURL(preview);
-      },
-      [preview]
-   );
 
    const pickFile = async (e) => {
       const file = e.target.files?.[0];
@@ -39,9 +33,9 @@ export default function AvatarUpload({ name, avatar, onUploaded }) {
          toast.error('That photo is over 5 MB. Pick a smaller one.');
          return;
       }
-      setPreview(URL.createObjectURL(file));
       setUploading(true);
       try {
+         setPreview(await readAsDataUrl(file));
          const formData = new FormData();
          formData.append('image', file);
          const data = await api.put('/auth/profile', formData);

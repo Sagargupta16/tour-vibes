@@ -1,10 +1,11 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { imageUrl } from '@/lib/api';
+import { readAsDataUrl } from '@/lib/read-file';
 import Field from './field';
 import ImageDropZone from './image-drop-zone';
 import TagInput from './tag-input';
@@ -29,11 +30,8 @@ export default function PostFormBody({ editPost, onSubmit, onDone, onCancel }) {
    const [serverErrors, setServerErrors] = useState({});
    const [submitting, setSubmitting] = useState(false);
 
-   // Frees the previous preview when the photo changes, and the last one on close
-   useEffect(() => {
-      if (!image) return undefined;
-      return () => URL.revokeObjectURL(image.url);
-   }, [image]);
+   // The newest pick wins even if an older, larger file finishes reading later
+   const pickRef = useRef(null);
 
    const preview = image?.url || (editPost ? imageUrl(editPost.imageUrl) : '');
    const errors = { ...validate(values, Boolean(preview)), ...serverErrors };
@@ -59,7 +57,17 @@ export default function PostFormBody({ editPost, onSubmit, onDone, onCancel }) {
          return;
       }
       setImageError(problem);
-      if (!problem) setImage({ file, url: URL.createObjectURL(file) });
+      if (!problem) void showPreview(file);
+   };
+
+   const showPreview = async (file) => {
+      pickRef.current = file;
+      try {
+         const url = await readAsDataUrl(file);
+         if (pickRef.current === file) setImage({ file, url });
+      } catch (err) {
+         toast.error(err.message);
+      }
    };
 
    const handleSubmit = async (e) => {
