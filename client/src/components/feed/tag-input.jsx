@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { scaleIn } from '@/lib/motion';
@@ -11,7 +11,6 @@ const clean = (raw) => raw.trim().replace(/^#+/, '').toLowerCase().slice(0, 30);
 // empty field removes the last one; pasting "a, b, c" adds all three.
 export default function TagInput({ id, value, onChange }) {
    const [draft, setDraft] = useState('');
-   const inputRef = useRef(null);
    const full = value.length >= MAX_TAGS;
 
    const add = (raw) => {
@@ -23,11 +22,10 @@ export default function TagInput({ id, value, onChange }) {
    const remove = (tag) => onChange(value.filter((t) => t !== tag));
 
    return (
-      // A click anywhere in the box focuses the text field, like a native input. The box
-      // itself is presentational: keyboard users reach the input directly
-      <div
-         role="presentation"
-         onClick={() => inputRef.current?.focus()}
+      // A label, so a click anywhere in the box focuses the text field like a native
+      // input; the field keeps its own label as its name through aria-labelledby
+      <label
+         htmlFor={id}
          className="relative flex min-h-11 flex-wrap items-center gap-1.5 rounded-lg border border-input px-2 py-1.5 transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30"
       >
          <AnimatePresence initial={false} mode="popLayout">
@@ -61,7 +59,7 @@ export default function TagInput({ id, value, onChange }) {
          ) : (
             <input
                id={id}
-               ref={inputRef}
+               aria-labelledby={`${id}-label`}
                value={draft}
                enterKeyHint="done"
                autoComplete="off"
@@ -84,6 +82,6 @@ export default function TagInput({ id, value, onChange }) {
                className="h-8 min-w-28 flex-1 bg-transparent px-1 text-base outline-none placeholder:text-muted-foreground md:text-sm"
             />
          )}
-      </div>
+      </label>
    );
 }

@@ -9,7 +9,9 @@ export default function Field({ id, label, hint, error, className, children }) {
    return (
       <div className={cn('space-y-2', className)}>
          <div className="flex items-baseline justify-between gap-3">
-            <Label htmlFor={id}>{label}</Label>
+            <Label id={`${id}-label`} htmlFor={id}>
+               {label}
+            </Label>
             {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
          </div>
          {children}
