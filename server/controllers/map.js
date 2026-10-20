@@ -9,7 +9,10 @@ const wrapLng = (lng) => ((((lng + 180) % 360) + 360) % 360) - 180;
 // bbox=west,south,east,north (Leaflet's toBBoxString order). Returns a Mongo
 // filter on the pin fields, or throws a 400 for anything that is not 4 numbers.
 const bboxFilter = (raw) => {
-   const parts = String(raw).split(',').map(Number);
+   // Number('') is 0, so a blank part (",,,") must be rejected before it becomes a coordinate
+   const parts = String(raw)
+      .split(',')
+      .map((part) => (part.trim() === '' ? Number.NaN : Number(part)));
    if (parts.length !== 4 || !parts.every(Number.isFinite) || parts[1] > parts[3]) {
       const error = new Error('bbox must be west,south,east,north');
       error.statusCode = 400;

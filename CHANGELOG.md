@@ -2,6 +2,57 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.9.0 - 2026-10-20
+
+### Added
+
+- Live demo at https://sagargupta.online/tour-vibes/ on GitHub Pages. `npm run build:demo` (client) builds the app for `/tour-vibes/` with an in-browser mock API in `src/lib/demo/` in place of the server: the same 20 routes, response shapes, validation messages and status codes, seeded from `server/seed/data.json`. Writes stay in the visitor's browser (localStorage for data, IndexedDB for downscaled photos), a banner says so and offers a reset, and the one-click demo login is on. `npm run dev:demo` runs it locally with no server or database. The new `Pages` workflow deploys it on every push to main that touches the client or the seed data. Normal and Docker builds contain none of the demo code
+- Browsing is public: the feed, a single journal, the map, search, tags, comments and traveler pages no longer need an account. Posting, liking and commenting still do, and an anonymous visitor who tries gets a sign-in prompt that returns them to the same page
+- Traveler pages at `/travelers/:userId`: avatar, bio, home base, member since, journal, place and like counts, a map of their pins and their journals. Every author name links to one
+- Landing page rebuilt: a dotted world map with the most-liked journals pinned and joined by a route, a photo stack that follows the highlighted stop, a most-loved strip, how it works, a map teaser and a live journal count, all from one `GET /feed/posts?sort=popular`
+- Map page: a list of the journals in view (side panel on desktop, card rail on phones) that flies the map to a pin, a count of journals in view, locate-me and fit-all controls, pins that drop in and a styled popup
+- Feed filters (search, tag, sort, page) live in the URL, so a filtered feed can be shared and the back button works. Tags on cards and journals link to the filtered feed
+- Single journal: full-bleed photo with a lightbox, share button (native share sheet or copy link), optimistic like with a heart burst, animated comments, and a confirm dialog before deleting
+- Post form: drag-and-drop photo with preview, tags as chips, inline errors that match the server rules, and a "My location" button on the pin picker
+- Sign in and sign up: split layout with an animated route illustration, show/hide password, a strength meter, field-level errors and a shake on failure. Sign up signs the user in straight away
+- Profile: the avatar uploads as soon as it is picked with a live preview, a bio counter, unsaved-changes tracking and a link to the public traveler page
+- My Journals: journal, place and like totals
+- A design system: one blue accent in both themes, Schibsted Grotesk for headings (self-hosted like Inter), shared motion tokens in `src/lib/motion.js`, page transitions, a solid header with a sliding active-page pill, a theme toggle that grows the new theme out of the button, and a footer with links. Open Graph and Twitter tags with a 1200x630 share card, theme-color, an apple-touch-icon and a new favicon
+- 20 more API tests (52 in total): public reads, anonymous writes, stale tokens on public routes, the public profile field list, and a regression test for most of the server fixes below
+
+### Changed
+
+- New optional-auth middleware on every public read: no token means anonymous, a bad or expired token is still a 401 so the client signs out
+- Session and theme keys in localStorage are prefixed with `tour-vibes:`. The demo shares sagargupta.online with other apps that keep a bare `token`, which would have signed visitors in and out of each other. Anyone signed in before this release signs in once more
+- `npm run dev` in `server/` uses `node --watch` instead of nodemon. Dropping nodemon clears the last 3 high `npm audit` findings (braces via chokidar, dev only)
+- Server 5xx responses log the error and send "Something went wrong" instead of the raw driver message. Non-size multer errors are a 400. CORS runs before the body parser, so a malformed-JSON 400 is readable from the browser
+- New limits, all 422s: title 5 to 200 characters, content up to 20000, location fields up to 100, name up to 80, at most 20 tags of 40 characters, and a valid travel date
+- JS loaded on first paint is 649.81 kB raw (208.39 kB gzip), up from 596.27 kB (191.54 kB) for the new landing page and design system
+
+### Fixed
+
+- A duplicate signup with different letter case (Alice@x.com after alice@x.com) returned a 500
+- `?tag=a&tag=b` returned a 500, and so did `?sort=popular` with a huge page number
+- A failed create, edit or profile update (validation error, bad tags, not the owner) left the uploaded file on disk
+- Editing a post or profile deleted the old image before the save, so a failed save left a broken image. Deleting a post now removes the record before the file
+- Two quick likes from one user could count twice; likes now use an atomic `$addToSet` / `$pull`
+- An edit could not clear the city, country or travel date
+- A password with a trailing space could not be changed
+- A blank `bbox=,,,` was accepted as the point 0,0
+- Page transitions never played, and logging out from a signed-in page sent the user to the login page instead of home
+- After sign-in, the user always landed on the feed instead of the page they came from
+- `<Button asChild>` rendered a button wrapping a link; links styled as buttons are real links again
+- The font stack named 'Inter', which never matched the installed 'Inter Variable', so the site rendered in the system font
+- Every plain `border` was drawn in the text colour instead of the border colour
+- Toasts ignored the app theme
+- Travel dates showed the previous month for users west of UTC
+- A new journal was added to whatever page or filter was showing, and deleting the last journal on a later page showed "No journals yet"
+- A signed-in name change did not reach the header until the next login
+- Map markers flickered away when a pan finished while the previous request was being read
+- Dark map tiles showed hairline seams between tile rows on high-DPI phones
+- Switching the theme again mid-animation left an unhandled promise rejection from the skipped view transition
+- The comment form showed for anonymous visitors, whose comments then failed with a 401; the sort select showed the raw value `newest`; tag chips and comment delete buttons were not reachable or named for keyboard and screen reader users
+
 ## v0.8.0 - 2026-10-18
 
 ### Added

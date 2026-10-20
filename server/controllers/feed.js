@@ -9,9 +9,11 @@ const {
    parsePage,
    normalizePath,
    clearImage,
+   discardUpload,
    getSortOption,
    parseTags,
-   parseCoordinates
+   parseCoordinates,
+   applyPostEdits
 } = require('../util/helpers');
 
 exports.getPosts = async (req, res, next) => {
@@ -19,7 +21,7 @@ exports.getPosts = async (req, res, next) => {
       const page = parsePage(req.query.page);
       const filter = {};
       if (req.query.tag) {
-         filter.tags = req.query.tag.toLowerCase();
+         filter.tags = String(req.query.tag).toLowerCase();
       }
       const totalItems = await Post.countDocuments(filter);
       let posts;
@@ -75,7 +77,9 @@ exports.searchPosts = async (req, res, next) => {
       const page = parsePage(req.query.page);
       // Force primitive string; blocks NoSQL operator injection (e.g. { $regex: '.*' })
       // Use explicit String() -- ternary guard is not enough for Sonar taint analysis.
-      const q = String(req.query.q == null ? '' : req.query.q).trim();
+      const q = String(req.query.q == null ? '' : req.query.q)
+         .trim()
+         .slice(0, 200);
       if (!q) {
          return res.status(200).json({ message: 'No query provided', posts: [], totalItems: 0 });
       }
@@ -94,6 +98,7 @@ exports.searchPosts = async (req, res, next) => {
 };
 
 exports.createPost = async (req, res, next) => {
+   let saved = false;
    try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -126,10 +131,12 @@ exports.createPost = async (req, res, next) => {
       if (req.body.travelDate) postData.travelDate = new Date(req.body.travelDate);
       const post = new Post(postData);
       await post.save();
+      saved = true;
       await User.findByIdAndUpdate(req.userId, { $push: { posts: post._id } });
       const populated = await post.populate('creator', 'name avatar');
       res.status(201).json({ message: 'Post successfully created', post: populated });
    } catch (err) {
+      if (!saved) discardUpload(req);
       if (!err.statusCode) err.statusCode = 500;
       next(err);
    }
@@ -151,6 +158,7 @@ exports.getPost = async (req, res, next) => {
 };
 
 exports.updatePost = async (req, res, next) => {
+   let saved = false;
    try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -173,26 +181,18 @@ exports.updatePost = async (req, res, next) => {
       // Never take the image path from the request body: a client could point its
       // post at another user's file, then delete the post and with it that file.
       const imageUrl = req.file ? normalizePath(req.file.path) : post.imageUrl;
-      if (imageUrl !== post.imageUrl) clearImage(post.imageUrl);
-      post.title = req.body.title;
-      post.content = req.body.content;
+      const oldImageUrl = post.imageUrl;
       post.imageUrl = imageUrl;
-      if (req.body.tags) post.tags = parseTags(req.body.tags);
-      if (req.body.locationName !== undefined || req.body.locationCountry !== undefined) {
-         post.location.name = req.body.locationName || post.location.name;
-         post.location.country = req.body.locationCountry || post.location.country;
-      }
-      // undefined: pin not sent, keep it; null: pin removed; object: pin moved
-      const coords = parseCoordinates(req.body);
-      if (coords !== undefined) {
-         post.location.lat = coords?.lat;
-         post.location.lng = coords?.lng;
-      }
-      if (req.body.travelDate) post.travelDate = new Date(req.body.travelDate);
+      applyPostEdits(post, req.body);
       const result = await post.save();
+      saved = true;
+      // Only now is the old file unreferenced; clearing it before the save broke the post
+      // whenever the save failed
+      if (imageUrl !== oldImageUrl) clearImage(oldImageUrl);
       const populated = await result.populate('creator', 'name avatar');
       res.status(200).json({ message: 'Post updated successfully', post: populated });
    } catch (err) {
+      if (!saved) discardUpload(req);
       if (!err.statusCode) err.statusCode = 500;
       next(err);
    }
@@ -211,8 +211,8 @@ exports.deletePost = async (req, res, next) => {
          error.statusCode = 403;
          throw error;
       }
-      clearImage(post.imageUrl);
       await Post.findByIdAndDelete(req.params.postId);
+      clearImage(post.imageUrl);
       await Comment.deleteMany({ post: post._id });
       await User.findByIdAndUpdate(req.userId, { $pull: { posts: post._id } });
       res.status(200).json({ message: 'Post deleted successfully' });

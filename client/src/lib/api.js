@@ -1,13 +1,27 @@
+import { clearStored, getStored } from './session';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export function imageUrl(path) {
    if (!path) return '';
-   if (path.startsWith('http')) return path;
+   if (/^(?:https?|data|blob):/.test(path)) return path;
+   // The static demo serves its seeded photos from public/demo/ under the app's base path
+   if (import.meta.env.VITE_STATIC_DEMO === 'true') return `${import.meta.env.BASE_URL}${path}`;
    return `${API_URL}/${path}`;
 }
 
+// The static demo build (GitHub Pages) has no server: the in-browser mock API in
+// lib/demo answers instead. Every other build drops this import.
+async function send(path, init) {
+   if (import.meta.env.VITE_STATIC_DEMO === 'true') {
+      const { demoFetch } = await import('./demo/index');
+      return demoFetch(path, init);
+   }
+   return fetch(`${API_URL}${path}`, init);
+}
+
 async function request(path, options = {}) {
-   const token = localStorage.getItem('token');
+   const token = getStored('token');
    const headers = { ...options.headers };
 
    if (token) {
@@ -17,15 +31,12 @@ async function request(path, options = {}) {
       headers['Content-Type'] = 'application/json';
    }
 
-   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+   const res = await send(path, { ...options, headers });
 
    // Only a request that carried a token can have an expired session; a failed
    // login is also a 401 and must surface the server's message instead.
    if (res.status === 401 && token) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('expiryDate');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('name');
+      clearStored();
       globalThis.dispatchEvent(new Event('auth:expired'));
       throw new Error('Session expired');
    }

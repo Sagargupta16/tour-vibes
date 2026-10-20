@@ -3,7 +3,17 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 
-export default defineConfig({
+// `--mode demo` (npm run build:demo / dev:demo) is the static GitHub Pages build:
+// served from /tour-vibes/, with the in-browser mock API (src/lib/demo) in place
+// of the server and the one-click demo login on. Every other mode is unchanged.
+const demoEnv = {
+   'import.meta.env.VITE_STATIC_DEMO': JSON.stringify('true'),
+   'import.meta.env.VITE_DEMO_LOGIN': JSON.stringify('true')
+};
+
+export default defineConfig(({ mode }) => ({
+   base: mode === 'demo' ? '/tour-vibes/' : '/',
+   define: mode === 'demo' ? demoEnv : {},
    plugins: [react(), tailwindcss()],
    resolve: {
       alias: {
@@ -37,4 +47,4 @@ export default defineConfig({
          }
       }
    }
-});
+}));

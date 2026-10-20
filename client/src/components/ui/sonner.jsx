@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/contexts/theme-context';
 import { Toaster as Sonner } from 'sonner';
 import {
    CircleCheckIcon,
@@ -9,11 +9,12 @@ import {
 } from 'lucide-react';
 
 const Toaster = ({ ...props }) => {
-   const { theme = 'system' } = useTheme();
+   // The app's own ThemeProvider, not next-themes (which has no provider here)
+   const { resolvedTheme } = useTheme();
 
    return (
       <Sonner
-         theme={theme}
+         theme={resolvedTheme}
          className="toaster group"
          icons={{
             success: <CircleCheckIcon className="size-4" />,

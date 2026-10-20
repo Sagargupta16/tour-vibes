@@ -25,7 +25,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run dev
 
 # Individual
-npm run server     # Express on port 8000 (nodemon)
+npm run server     # Express on port 8000 (node --watch)
 npm run client     # Vite React on port 3000
 
 # Install all deps
@@ -44,6 +44,8 @@ npm run seed           # demo users and pinned journals (only replaces *@demo.to
 
 # Client (run in client/)
 npm run bundle:report  # chunk sizes after npm run build
+npm run dev:demo       # serverless demo at localhost:3000/tour-vibes/ (in-browser mock API)
+npm run build:demo     # the GitHub Pages build: base /tour-vibes/, mock API, 404.html fallback
 
 # Whole stack in Docker
 docker compose up --build
@@ -76,19 +78,21 @@ server/   -- Express 5 REST API with MongoDB (Mongoose 9)
 
 Entry point: `app.js` -- Express, CORS, static `/images`, error handler. Exports the app; connects to MongoDB and listens only when run directly (`require.main === module`), so `test/` can load it.
 
-- `routes/feed.js` -- post CRUD, search, tags, likes, comments
+- `routes/feed.js` -- post CRUD, search, tags, likes, comments. Every GET is public through `optional-auth`; writes use `isAuth`
 - `routes/auth.js` -- signup, login, profile, password change (every route rate-limited)
 - `controllers/feed.js` / `controllers/auth.js` / `controllers/comment.js` / `controllers/like.js` / `controllers/map.js` (bbox query, antimeridian split)
 - `models/post.js` / `models/users.js` / `models/comment.js`
 - `middleware/is-auth.js` -- JWT verification from `process.env.JWT_SECRET`
+- `middleware/optional-auth.js` -- public reads: no `Authorization` header is anonymous, any header goes through `is-auth` (a stale token is still a 401, which signs the client out)
 - `middleware/upload.js` -- Multer (5MB, PNG/JPG), mounted per route after `isAuth` on create/update post and update profile
 - `middleware/valid-id.js` -- `router.param` guard: malformed `:postId`, `:commentId`, `:userId` is a 400
 - `test/` -- `setup.js` (in-memory MongoDB, user/post helpers) plus one file per area; run with `--test-concurrency=1` because the files share `images/`
 - `scripts/seed.js` + `seed/data.json` + `seed/photos/` -- demo data; photo credits in `seed/photos/CREDITS.md`
-- `util/helpers.js` -- shared pagination, path normalization, image cleanup
+- `util/helpers.js` -- shared pagination (page capped at 100000), path normalization, image cleanup, `discardUpload` (multer writes before validation, so every failed request that carried a file removes it)
 
 **Key patterns:**
-- All mutations check ownership (`post.creator === req.userId`)
+- All mutations check ownership (`post.creator === req.userId`); an old image is deleted only after the save that replaces it succeeds
+- 5xx responses log the error and send a generic message; validation errors are 422 with the express-validator `data` array
 - Pagination: 10 per page, `?page=N&sort=newest|oldest|popular&tag=X`
 - Full-text search: `GET /feed/search?q=keyword`
 - Tags sent as JSON array string in FormData
@@ -97,29 +101,38 @@ Entry point: `app.js` -- Express, CORS, static `/images`, error handler. Exports
 
 ### Frontend (`client/src/`)
 
-Vite + React 19 + Tailwind CSS 4 + shadcn/ui. Minimalist/clean design with dark mode.
+Vite + React 19 + Tailwind CSS 4 + shadcn/ui on Base UI. One blue accent (`--primary`) in both themes, flat bordered cards, visible motion; glassmorphism, gradient text and glow are out. Headings use Schibsted Grotesk, body Inter (both self-hosted via Fontsource).
 
-- `contexts/` -- `AuthContext` (token, login, signup, logout), `ThemeContext` (dark/light/system)
-- `hooks/` -- `use-feed.js` (CRUD + search/sort/tag), `use-debounce.js`
-- `lib/` -- `api.js` (centralized fetch, auto Bearer token, 401 handling), `validators.js`
-- `components/ui/` -- shadcn/ui primitives (Button, Card, Dialog, Sheet, etc.)
-- `components/layout/` -- header, mobile-nav, root-layout
-- `components/feed/` -- post-card, post-form, search-bar, tag-filter, sort-select, pagination
-- `components/post/` -- like-button, comment-list, comment-form
-- `components/profile/` -- profile-form, password-form
-- `components/shared/` -- page-transition (Framer Motion), skeleton loaders, empty-state, page-loader (Suspense fallback)
-- `components/map/` -- map-base (Leaflet + OSM tiles), pin-icon (SVG divIcon), location-picker (post form), post-location-map
-- `pages/` -- home, login, signup, feed, my-journals, single-post, map, profile, not-found. Every page but home is `React.lazy` in `App.jsx`; `vite.config.js` puts React, Framer Motion and Leaflet in their own chunks
+- `contexts/` -- `AuthContext` (token, userId, userName, avatar, login, demoLogin, signup, logout, updateUser, refreshUser), `ThemeContext` (dark/light/system)
+- `hooks/` -- `use-feed.js` (CRUD + search/sort/tag, page from outside or its own), `use-map-posts.js`, `use-debounce.js`
+- `lib/` -- `api.js` (centralized fetch, auto Bearer token, 401 handling, demo switch), `session.js` (prefixed session keys), `motion.js` (shared easings, springs, durations, variants), `validators.js`, `geocode.js` (Nominatim)
+- `lib/demo/` -- the in-browser mock API for the Pages build: the server's routes, shapes and status codes, seeded from `public/demo/data.json`, data in localStorage (`tv-demo:*`), photos in IndexedDB
+- `styles/` -- `utilities.css` (`tv-container`, `tv-eyebrow`, `tv-hit` 44px tap area, `tv-press` and friends) and `leaflet.css` (map, pin and popup theming), both imported by `index.css`
+- `components/ui/` -- shadcn/ui primitives (Button with working `asChild`, `soft` variant, `xl` size; Card, Dialog, Sheet, etc.)
+- `components/layout/` -- header, nav-items, user-menu, theme-toggle, mobile-nav, site-footer, root-layout (keyed motion.div around a frozen `useOutlet()`, so the leaving page animates out)
+- `components/home/` -- landing sections: hero, hero-visual (dotted world map, pins, route), photo-stack, featured journals, how-it-works, map-teaser, closing CTA
+- `components/auth/` -- auth-shell and visual, form fields, demo login button, `use-auth-form`, `use-return-to`, protected-route
+- `components/feed/` -- post-card, post-grid, post-form (+ body, image drop zone, tag input), search-bar, tag-filter, sort-select, pagination, feed-hero, journal-stats, `use-feed-params` (URL state)
+- `components/post/` -- post-hero, photo-lightbox, post-meta, like-button, share-button, confirm-dialog, comment list/item/form, sign-in-prompt, `use-require-auth`
+- `components/profile/`, `components/traveler/` -- profile header, avatar upload, forms; traveler header, stats, map
+- `components/map/` -- map-base (Leaflet + OSM tiles), pin-icon, journal marker and popup, map controls, count chip, journal list, location-picker (post form), post-location-map
+- `components/shared/` -- page-transition, skeleton loaders, empty-state, page-loader (Suspense fallback)
+- `components/demo/` -- the live demo banner (demo build only)
+- `pages/` -- home, login, signup, feed, my-journals, single-post, map, traveler, profile, not-found. Every page but home is `React.lazy` in `App.jsx`; `vite.config.js` puts React, Framer Motion and Leaflet in their own chunks
 
 **Key patterns:**
 - API base URL from `VITE_API_URL` env var (no hardcoded URLs); `VITE_DEMO_LOGIN=true` shows a demo login button that calls `POST /auth/demo` (server signs in as `DEMO_EMAIL`)
+- Components reach the API only through `api` and `imageUrl()` from `lib/api.js`. `vite --mode demo` sets `VITE_STATIC_DEMO`, base `/tour-vibes/` and the demo login; `api.js` then dynamic-imports `lib/demo`, so normal and Docker builds contain no demo code
+- Public routes: `/`, `/login`, `/signup`, `/journals`, `/journals/:postId`, `/map`, `/travelers/:userId`. `/myjournals` and `/profile` sit behind `ProtectedRoute`, which sends `state.from` to `/login`; login, the demo login and signup return there
+- A page animating out already sees the next location, so render-time redirects check `useIsPresent()`, and sign-out wraps `logout()` and `navigate('/')` in one `startTransition`
+- Session and theme keys in localStorage carry the `tour-vibes:` prefix (the Pages origin is shared with other apps)
 - The session is read from localStorage synchronously in `AuthProvider`, so protected routes do not redirect on reload
 - `use-feed` and `use-map-posts` abort the previous request before starting a new one
 - Auth via `useAuth()` context hook (no prop drilling)
 - Dark/light mode via `useTheme()` with localStorage persistence
-- Feed state (search, tag, sort, page) in local React state via `useState` (not URL params)
+- Feed state (q, tag, sort, page) lives in the URL search params (`use-feed-params`); search and tag are exclusive because the search endpoint ignores tag and sort
 - Toast notifications (sonner) on all user actions
-- Framer Motion page transitions and hover effects
+- Framer Motion everywhere, with the values from `lib/motion.js`; never add prefers-reduced-motion
 
 ### API Endpoints
 

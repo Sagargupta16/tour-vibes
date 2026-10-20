@@ -1,81 +1,120 @@
-import { useState } from 'react';
-import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/auth-context';
 import useFeed from '@/hooks/use-feed';
-import { useDebounce } from '@/hooks/use-debounce';
-import PostCard from '@/components/feed/post-card';
-import PostForm from '@/components/feed/post-form';
-import SearchBar from '@/components/feed/search-bar';
-import TagFilter from '@/components/feed/tag-filter';
-import SortSelect from '@/components/feed/sort-select';
+import FeedEmpty from '@/components/feed/feed-empty';
+import FeedHero from '@/components/feed/feed-hero';
 import Pagination from '@/components/feed/pagination';
-import SkeletonCard from '@/components/shared/skeleton-card';
-import EmptyState from '@/components/shared/empty-state';
+import PostForm from '@/components/feed/post-form';
+import PostGrid from '@/components/feed/post-grid';
+import SearchBar from '@/components/feed/search-bar';
+import SortSelect from '@/components/feed/sort-select';
+import TagFilter from '@/components/feed/tag-filter';
+import useFeedParams from '@/components/feed/use-feed-params';
 import PageTransition from '@/components/shared/page-transition';
 
 export default function Feed() {
-   const [search, setSearch] = useState('');
-   const [tag, setTag] = useState('');
-   const [sort, setSort] = useState('newest');
+   const { isAuth } = useAuth();
+   const navigate = useNavigate();
+   const location = useLocation();
+   const { q, tag, sort, page, update } = useFeedParams();
    const [formOpen, setFormOpen] = useState(false);
-   const debouncedSearch = useDebounce(search);
+   const resultsRef = useRef(null);
 
-   const { posts, loading, page, lastPage, goToPage, createPost } = useFeed({
-      searchQuery: debouncedSearch,
-      tag,
-      sort
-   });
+   // The search endpoint cannot filter by tag or sort, so a search stands alone
+   const activeTag = q ? '' : tag;
+   const feed = useFeed({ searchQuery: q, tag: activeTag, sort: q ? 'newest' : sort, page });
+   const { posts, loading, error, lastPage } = feed;
+   // A shared link can point past the last page (or a page emptied since): step back
+   const pastEnd = !loading && lastPage > 0 && page > lastPage;
+
+   useEffect(() => {
+      if (pastEnd) update({ page: lastPage }, { replace: true });
+   }, [pastEnd, lastPage, update]);
+
+   // Bring the results into view when the filters or page change below the fold,
+   // e.g. after tapping a tag on a card halfway down the grid
+   const filterKey = `${q}|${activeTag}|${sort}|${page}`;
+   useEffect(() => {
+      const el = resultsRef.current;
+      if (el && el.getBoundingClientRect().top < 0) {
+         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+   }, [filterKey]);
+
+   const openNew = () => {
+      if (!isAuth) {
+         navigate('/login', { state: { from: location } });
+         return;
+      }
+      setFormOpen(true);
+   };
 
    const handleCreate = async (formData) => {
-      await createPost(formData);
+      await feed.createPost(formData);
+      // Newest first, unfiltered, page 1 is where the new journal shows up
+      update({ q: '', tag: '', sort: '', page: '' });
    };
+
+   const clearFilters = () => update({ q: '', tag: '', page: '' });
 
    return (
       <PageTransition>
-         <div className="mx-auto max-w-6xl px-4 py-8">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-               <h1 className="text-2xl font-bold">Journals</h1>
-               <Button onClick={() => setFormOpen(true)}>
-                  <Plus className="mr-1 h-4 w-4" />
-                  New Journal
-               </Button>
-            </div>
+         <div className="tv-container pb-16">
+            <FeedHero
+               total={feed.totalPosts}
+               query={feed.resultQuery}
+               ready={!loading || posts.length > 0}
+               onNew={openNew}
+            />
 
-            <div className="mb-6 space-y-4">
-               <div className="flex flex-col gap-3 sm:flex-row">
-                  <div className="flex-1">
-                     <SearchBar value={search} onChange={setSearch} />
+            {/* Sticky under the 64px header on phones, where the grid is one long column */}
+            <div className="sticky top-16 z-30 -mx-4 space-y-3 border-b bg-background px-4 py-3 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pt-0 sm:pb-6">
+               <div className="flex gap-2">
+                  <div className="min-w-0 flex-1">
+                     <SearchBar
+                        value={q}
+                        busy={loading}
+                        onSearch={(text) =>
+                           update({ q: text, tag: '', page: '' }, { replace: true })
+                        }
+                     />
                   </div>
-                  <SortSelect value={sort} onChange={setSort} />
+                  <SortSelect
+                     value={sort}
+                     searching={Boolean(q)}
+                     onChange={(next) => update({ sort: next, page: '' })}
+                  />
                </div>
-               <TagFilter activeTag={tag} onTagChange={setTag} />
-            </div>
-
-            {loading && (
-               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {[1, 2, 3].map((i) => (
-                     <SkeletonCard key={i} />
-                  ))}
-               </div>
-            )}
-            {!loading && posts.length === 0 && (
-               <EmptyState
-                  title="No journals found"
-                  description={
-                     search ? 'Try a different search term' : 'Be the first to share a story!'
-                  }
+               <TagFilter
+                  activeTag={activeTag}
+                  onTagChange={(next) => update({ tag: next, q: '', page: '' })}
                />
-            )}
-            {!loading && posts.length > 0 && (
-               <>
-                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                     {posts.map((post) => (
-                        <PostCard key={post._id} post={post} />
-                     ))}
-                  </div>
-                  <Pagination page={page} lastPage={lastPage} onPageChange={goToPage} />
-               </>
-            )}
+            </div>
+
+            <section
+               ref={resultsRef}
+               aria-label="Journals"
+               className="scroll-mt-48 pt-5 sm:scroll-mt-20 sm:pt-0"
+            >
+               {!loading && !pastEnd && posts.length === 0 ? (
+                  <FeedEmpty
+                     error={error}
+                     q={q}
+                     tag={activeTag}
+                     onRetry={feed.reload}
+                     onClear={clearFilters}
+                     onNew={openNew}
+                  />
+               ) : (
+                  <PostGrid posts={posts} loading={loading || pastEnd} />
+               )}
+               <Pagination
+                  page={page}
+                  lastPage={lastPage}
+                  onPageChange={(next) => update({ page: next })}
+               />
+            </section>
 
             <PostForm
                open={formOpen}

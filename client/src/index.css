@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+/* Shared utility classes (tv-*) and the Leaflet theme; tokens and base styles stay here */
+@import './styles/utilities.css';
+@import './styles/leaflet.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -27,111 +30,155 @@
    --radius-md: calc(var(--radius) - 2px);
    --radius-lg: var(--radius);
    --radius-xl: calc(var(--radius) + 4px);
-   --font-sans: 'Inter', system-ui, sans-serif;
+   --radius-2xl: calc(var(--radius) + 8px);
+   --font-sans: 'Inter Variable', 'Inter', system-ui, sans-serif;
+   /* Headlines (h1, h2 and the font-display class); falls back to Inter */
+   --font-display: 'Schibsted Grotesk Variable', 'Inter Variable', system-ui, sans-serif;
+   /* Coordinates, dates, counts and eyebrow labels (font-mono class) */
+   --font-mono:
+      ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
 }
 
+@theme {
+   /* Same curves as lib/motion.js, so CSS and Framer Motion move alike */
+   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+   /* The skeleton sweep and an endless marquee row (render the marquee items twice) */
+   --animate-shimmer: tv-shimmer 1.6s var(--ease-in-out) infinite;
+   --animate-marquee: tv-marquee 40s linear infinite;
+}
+
+/* One blue accent; neutrals carry a faint tint of the same hue */
 :root {
    --radius: 0.625rem;
-   --background: oklch(1 0 0);
-   --foreground: oklch(0.145 0 0);
-   --card: oklch(1 0 0);
-   --card-foreground: oklch(0.145 0 0);
-   --popover: oklch(1 0 0);
-   --popover-foreground: oklch(0.145 0 0);
-   --primary: oklch(0.205 0 0);
-   --primary-foreground: oklch(0.985 0 0);
-   --secondary: oklch(0.97 0 0);
-   --secondary-foreground: oklch(0.205 0 0);
-   --muted: oklch(0.97 0 0);
-   --muted-foreground: oklch(0.556 0 0);
-   --accent: oklch(0.97 0 0);
-   --accent-foreground: oklch(0.205 0 0);
+   --background: oklch(0.985 0.004 255);
+   --foreground: oklch(0.2 0.02 262);
+   --card: oklch(0.998 0.0015 255);
+   --card-foreground: oklch(0.2 0.02 262);
+   --popover: oklch(0.998 0.0015 255);
+   --popover-foreground: oklch(0.2 0.02 262);
+   --primary: oklch(0.53 0.2 260);
+   --primary-foreground: oklch(0.985 0.005 255);
+   --secondary: oklch(0.955 0.008 255);
+   --secondary-foreground: oklch(0.24 0.02 262);
+   --muted: oklch(0.962 0.007 255);
+   --muted-foreground: oklch(0.51 0.02 258);
+   --accent: oklch(0.95 0.015 255);
+   --accent-foreground: oklch(0.2 0.02 262);
    --destructive: oklch(0.577 0.245 27.325);
    --destructive-foreground: oklch(0.577 0.245 27.325);
-   --border: oklch(0.922 0 0);
-   --input: oklch(0.922 0 0);
-   --ring: oklch(0.708 0 0);
+   --border: oklch(0.905 0.01 255);
+   --input: oklch(0.88 0.012 255);
+   --ring: oklch(0.53 0.2 260);
 }
 
+/* Near-black canvas; the accent is lighter here and carries dark ink for AA contrast */
 .dark {
-   --background: oklch(0.145 0 0);
-   --foreground: oklch(0.985 0 0);
-   --card: oklch(0.205 0 0);
-   --card-foreground: oklch(0.985 0 0);
-   --popover: oklch(0.205 0 0);
-   --popover-foreground: oklch(0.985 0 0);
-   --primary: oklch(0.985 0 0);
-   --primary-foreground: oklch(0.205 0 0);
-   --secondary: oklch(0.269 0 0);
-   --secondary-foreground: oklch(0.985 0 0);
-   --muted: oklch(0.269 0 0);
-   --muted-foreground: oklch(0.708 0 0);
-   --accent: oklch(0.269 0 0);
-   --accent-foreground: oklch(0.985 0 0);
-   --destructive: oklch(0.577 0.245 27.325);
-   --destructive-foreground: oklch(0.577 0.245 27.325);
-   --border: oklch(0.269 0 0);
-   --input: oklch(0.269 0 0);
-   --ring: oklch(0.439 0 0);
+   --background: oklch(0.152 0.008 262);
+   --foreground: oklch(0.965 0.005 255);
+   --card: oklch(0.185 0.01 262);
+   --card-foreground: oklch(0.965 0.005 255);
+   --popover: oklch(0.205 0.012 262);
+   --popover-foreground: oklch(0.965 0.005 255);
+   --primary: oklch(0.67 0.17 255);
+   --primary-foreground: oklch(0.16 0.03 262);
+   --secondary: oklch(0.24 0.012 262);
+   --secondary-foreground: oklch(0.965 0.005 255);
+   --muted: oklch(0.225 0.012 262);
+   --muted-foreground: oklch(0.71 0.015 258);
+   --accent: oklch(0.26 0.025 260);
+   --accent-foreground: oklch(0.965 0.005 255);
+   --destructive: oklch(0.65 0.2 25);
+   --destructive-foreground: oklch(0.65 0.2 25);
+   --border: oklch(0.27 0.012 262);
+   --input: oklch(0.3 0.014 262);
+   --ring: oklch(0.67 0.17 255);
 }
 
-body {
-   font-family: var(--font-sans);
-   background-color: var(--background);
-   color: var(--foreground);
-   -webkit-font-smoothing: antialiased;
-   -moz-osx-font-smoothing: grayscale;
+@layer base {
+   /* Preflight leaves borders at currentColor; every border uses the token instead */
+   *,
+   ::before,
+   ::after {
+      border-color: var(--border);
+   }
+
+   html {
+      color-scheme: light;
+      scroll-behavior: smooth;
+      scroll-padding-top: 5rem;
+      -webkit-tap-highlight-color: transparent;
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in oklch, var(--muted-foreground) 40%, transparent) transparent;
+   }
+
+   html.dark {
+      color-scheme: dark;
+   }
+
+   body {
+      font-family: var(--font-sans);
+      font-feature-settings: 'cv11';
+      background-color: var(--background);
+      color: var(--foreground);
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+   }
+
+   h1,
+   h2 {
+      font-family: var(--font-display);
+      letter-spacing: -0.025em;
+   }
+
+   h1,
+   h2,
+   h3,
+   h4 {
+      text-wrap: balance;
+   }
+
+   p {
+      text-wrap: pretty;
+   }
+
+   ::selection {
+      background: color-mix(in oklch, var(--primary) 28%, transparent);
+      color: var(--foreground);
+   }
+
+   /* Elements without their own focus style get the accent ring */
+   :focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+   }
+
+   button:not(:disabled),
+   [role='button']:not([aria-disabled='true']) {
+      cursor: pointer;
+   }
+
+   ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+   }
+
+   ::-webkit-scrollbar-thumb {
+      border: 3px solid transparent;
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--muted-foreground) 40%, transparent) content-box;
+   }
+
+   ::-webkit-scrollbar-track {
+      background: transparent;
+   }
 }
 
-/* Leaflet maps (map page, post form picker, single journal) */
-.tv-map {
-   background: var(--muted);
-   font-family: var(--font-sans);
-}
-
-/* Leaflet positions the icon element with its own transform, so the hover lift
-   goes on the inner svg */
-.tv-pin {
-   color: oklch(0.62 0.21 30);
-   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.35));
-}
-
-.tv-pin svg {
-   transform-origin: 50% 100%;
-   transition: transform 150ms ease-out;
-}
-
-.tv-pin:hover svg {
-   transform: translateY(-3px) scale(1.12);
-}
-
-.tv-map .leaflet-popup-content-wrapper,
-.tv-map .leaflet-popup-tip {
-   background: var(--popover);
-   color: var(--popover-foreground);
-}
-
-.tv-map .leaflet-popup-content {
-   margin: 10px;
-}
-
-/* Leaflet colours every link blue; the popup card keeps the theme text colour */
-.tv-map .leaflet-popup-content a {
-   color: inherit;
-}
-
-/* OSM has no dark tiles; invert the light ones and rotate hue back */
-.dark .tv-map .leaflet-tile-pane {
-   filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
-}
-
-.dark .tv-map .leaflet-bar a,
-.dark .tv-map .leaflet-control-attribution {
-   background: var(--card);
-   color: var(--card-foreground);
-   border-color: var(--border);
-}
-
-.dark .tv-map .leaflet-control-attribution a {
-   color: var(--muted-foreground);
+/* Theme switch: the toggle grows the new theme out of itself as a circle
+   (theme-toggle.jsx drives the clip-path), so the default crossfade is off */
+::view-transition-old(root),
+::view-transition-new(root) {
+   animation: none;
+   mix-blend-mode: normal;
 }

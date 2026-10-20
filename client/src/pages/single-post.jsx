@@ -1,125 +1,235 @@
-import { lazy, Suspense, useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { CloudOff, Compass, MapPinOff, Pencil, RotateCw, Trash2 } from 'lucide-react';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { useAuth } from '@/contexts/auth-context';
 import { api, imageUrl } from '@/lib/api';
-import LikeButton from '@/components/post/like-button';
+import { fadeUp, reveal, stagger } from '@/lib/motion';
+import { cn } from '@/lib/utils';
+import { placeOf } from '@/components/feed/format';
+import PostForm from '@/components/feed/post-form';
 import CommentList from '@/components/post/comment-list';
-import SkeletonPost from '@/components/shared/skeleton-post';
+import ConfirmDialog from '@/components/post/confirm-dialog';
+import LikeButton from '@/components/post/like-button';
+import PhotoLightbox from '@/components/post/photo-lightbox';
+import PostHero from '@/components/post/post-hero';
+import PostMeta from '@/components/post/post-meta';
+import ShareButton from '@/components/post/share-button';
+import EmptyState from '@/components/shared/empty-state';
 import PageTransition from '@/components/shared/page-transition';
+import SkeletonPost from '@/components/shared/skeleton-post';
 
 const PostLocationMap = lazy(() => import('@/components/map/post-location-map'));
 
+// Lists that link here pass { from: location }; going back keeps their filters
+const BACK_LABELS = { '/journals': 'Journals', '/myjournals': 'My journals', '/map': 'Map' };
+const backOf = (from) => {
+   const path = from?.pathname;
+   const to = { pathname: path, search: from?.search ?? '' };
+   if (path?.startsWith('/travelers/')) return { to, label: 'Traveler', known: true };
+   if (BACK_LABELS[path]) return { to, label: BACK_LABELS[path], known: true };
+   return { to: '/journals', label: 'Journals', known: false };
+};
+
+const roundBtn = 'h-11 rounded-full px-4';
+
 export default function SinglePost() {
    const { postId } = useParams();
-   const [post, setPost] = useState(null);
-   const [loading, setLoading] = useState(true);
+   const location = useLocation();
+   const navigate = useNavigate();
+   const { userId } = useAuth();
+   const [version, setVersion] = useState(0);
+   const [state, setState] = useState({ key: null, post: null, error: null });
+   const [lightbox, setLightbox] = useState(false);
+   const [editing, setEditing] = useState(false);
+   const [deleting, setDeleting] = useState(false);
+   const requestKey = `${postId}#${version}`;
+   const back = backOf(location.state?.from);
 
    useEffect(() => {
-      api.get(`/feed/post/${postId}`)
-         .then((data) => setPost(data.post))
-         .catch(() => {})
-         .finally(() => setLoading(false));
-   }, [postId]);
+      const controller = new AbortController();
+      const load = async () => {
+         try {
+            const data = await api.get(`/feed/post/${postId}`, { signal: controller.signal });
+            if (!controller.signal.aborted)
+               setState({ key: requestKey, post: data.post, error: null });
+         } catch (err) {
+            if (controller.signal.aborted || err.name === 'AbortError') return;
+            setState({ key: requestKey, post: null, error: err });
+         }
+      };
+      void load();
+      return () => controller.abort();
+   }, [postId, requestKey]);
 
-   if (loading) return <SkeletonPost />;
+   if (state.key !== requestKey) return <SkeletonPost />;
+
+   const { post, error } = state;
    if (!post) {
+      // 400 is a malformed id, 404 a deleted journal; anything else may be temporary
+      const missing = !error || error.status === 404 || error.status === 400;
       return (
-         <div className="py-16 text-center text-muted-foreground">
-            <p className="text-lg">Post not found</p>
-            <Button variant="link" asChild className="mt-2">
-               <Link to="/journals">Back to journals</Link>
-            </Button>
-         </div>
+         <PageTransition>
+            <EmptyState
+               className="py-24"
+               icon={missing ? MapPinOff : CloudOff}
+               title={missing ? 'This journal is gone' : 'This journal could not be loaded'}
+               description={missing ? 'It may have been deleted by its author.' : error.message}
+               action={
+                  missing ? (
+                     <Link to="/journals" className={cn(buttonVariants(), roundBtn)}>
+                        <Compass />
+                        Browse journals
+                     </Link>
+                  ) : (
+                     <Button
+                        variant="outline"
+                        className={roundBtn}
+                        onClick={() => setVersion((v) => v + 1)}
+                     >
+                        <RotateCw />
+                        Try again
+                     </Button>
+                  )
+               }
+            />
+         </PageTransition>
       );
    }
 
-   const date = new Date(post.createdAt).toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-   });
+   const isOwner = Boolean(userId) && post.creator?._id === userId;
+   const hasPin = post.location?.lat != null && post.location?.lng != null;
+   const place = placeOf(post.location);
+
+   const handleUpdate = async (formData) => {
+      const data = await api.put(`/feed/post/${post._id}`, formData);
+      setState((s) => ({ ...s, post: data.post }));
+   };
+
+   const handleDelete = async () => {
+      await api.delete(`/feed/post/${post._id}`);
+      toast.success('Journal deleted');
+      // Back to the list it was opened from, else to the owner's own journals
+      navigate(back.known ? back.to : '/myjournals', { replace: true });
+   };
 
    return (
       <PageTransition>
-         <article className="mx-auto max-w-3xl px-4 py-8">
-            <Button variant="ghost" size="sm" asChild className="mb-4">
-               <Link to="/journals">
-                  <ArrowLeft className="mr-1 h-4 w-4" />
-                  Back
-               </Link>
-            </Button>
+         <article>
+            <PostHero post={post} back={back} onOpenPhoto={() => setLightbox(true)} />
 
-            <h1 className="text-3xl font-bold leading-tight">{post.title}</h1>
+            <motion.div
+               variants={stagger(0.08, 0.25)}
+               initial="hidden"
+               animate="show"
+               className="mx-auto max-w-3xl space-y-8 px-4 py-8 sm:py-10"
+            >
+               <PostMeta post={post} />
 
-            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-               <span>By {post.creator?.name}</span>
-               <span>&middot;</span>
-               <span>{date}</span>
-               {post.location?.name && (
-                  <>
-                     <span>&middot;</span>
-                     <span className="flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {post.location.name}
-                        {post.location.country ? `, ${post.location.country}` : ''}
-                     </span>
-                  </>
+               <motion.div
+                  variants={fadeUp}
+                  className="flex flex-wrap items-center gap-2 border-y py-3"
+               >
+                  <LikeButton
+                     key={`${post._id}-${userId ?? 'guest'}`}
+                     postId={post._id}
+                     likes={post.likes || []}
+                  />
+                  <ShareButton
+                     title={post.title}
+                     text={place ? `${post.title} - ${place}` : post.title}
+                  />
+                  {isOwner && (
+                     <div className="ml-auto flex gap-2">
+                        <Button
+                           variant="outline"
+                           className={roundBtn}
+                           onClick={() => setEditing(true)}
+                        >
+                           <Pencil />
+                           <span className="max-sm:sr-only">Edit</span>
+                        </Button>
+                        <Button
+                           variant="ghost"
+                           className={cn(
+                              roundBtn,
+                              'text-destructive hover:bg-destructive/10 hover:text-destructive'
+                           )}
+                           onClick={() => setDeleting(true)}
+                        >
+                           <Trash2 />
+                           <span className="max-sm:sr-only">Delete</span>
+                        </Button>
+                     </div>
+                  )}
+               </motion.div>
+
+               <motion.div
+                  variants={fadeUp}
+                  className="text-base leading-relaxed text-pretty whitespace-pre-line text-foreground/90 sm:text-lg sm:leading-8"
+               >
+                  {post.content}
+               </motion.div>
+            </motion.div>
+
+            <div className="mx-auto max-w-3xl space-y-12 px-4 pb-16">
+               {hasPin && (
+                  <motion.section
+                     {...reveal}
+                     variants={fadeUp}
+                     aria-labelledby="where-title"
+                     className="space-y-3"
+                  >
+                     <div className="flex items-baseline justify-between gap-3">
+                        <h2 id="where-title" className="text-xl font-semibold tracking-tight">
+                           Where it happened
+                        </h2>
+                        {place && (
+                           <span className="truncate text-sm text-muted-foreground">{place}</span>
+                        )}
+                     </div>
+                     <div className="overflow-hidden rounded-xl border">
+                        <Suspense
+                           fallback={<div className="h-56 animate-pulse bg-muted sm:h-72" />}
+                        >
+                           <PostLocationMap lat={post.location.lat} lng={post.location.lng} />
+                        </Suspense>
+                     </div>
+                  </motion.section>
                )}
-               {post.travelDate && (
-                  <>
-                     <span>&middot;</span>
-                     <span className="flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5" />
-                        {new Date(post.travelDate).toLocaleDateString('en-US', {
-                           month: 'long',
-                           year: 'numeric'
-                        })}
-                     </span>
-                  </>
-               )}
+
+               <motion.div {...reveal} variants={fadeUp}>
+                  <CommentList postId={post._id} />
+               </motion.div>
             </div>
-
-            {post.tags?.length > 0 && (
-               <div className="mt-3 flex flex-wrap gap-1.5">
-                  {post.tags.map((tag) => (
-                     <Badge key={tag} variant="secondary">
-                        {tag}
-                     </Badge>
-                  ))}
-               </div>
-            )}
-
-            {post.imageUrl && (
-               <img
-                  src={imageUrl(post.imageUrl)}
-                  alt={post.title}
-                  className="mt-6 w-full rounded-lg object-cover"
-               />
-            )}
-
-            <div className="prose prose-neutral dark:prose-invert mt-6 max-w-none">
-               <p className="whitespace-pre-line">{post.content}</p>
-            </div>
-
-            {post.location?.lat != null && (
-               <Suspense fallback={<div className="mt-6 h-56 animate-pulse rounded-lg bg-muted" />}>
-                  <div className="mt-6">
-                     <PostLocationMap lat={post.location.lat} lng={post.location.lng} />
-                  </div>
-               </Suspense>
-            )}
-
-            <div className="mt-6">
-               <LikeButton postId={post._id} likes={post.likes || []} />
-            </div>
-
-            <Separator className="my-8" />
-            <CommentList postId={post._id} />
          </article>
+
+         <PhotoLightbox
+            open={lightbox}
+            onOpenChange={setLightbox}
+            src={imageUrl(post.imageUrl)}
+            alt={post.title}
+            caption={place}
+         />
+         {isOwner && (
+            <>
+               <PostForm
+                  open={editing}
+                  onOpenChange={setEditing}
+                  editPost={post}
+                  onSubmit={handleUpdate}
+               />
+               <ConfirmDialog
+                  open={deleting}
+                  onOpenChange={setDeleting}
+                  title="Delete this journal?"
+                  description={`"${post.title}" and its comments will be removed for good.`}
+                  onConfirm={handleDelete}
+               />
+            </>
+         )}
       </PageTransition>
    );
 }

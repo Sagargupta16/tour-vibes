@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Demo seed data copied in by scripts/prepare-demo.mjs
+public/demo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
