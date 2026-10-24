@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.9.1 - 2026-10-24
+
+### Fixed
+
+- Bump vite from 8.1.3 to 8.1.6 (client lockfile) for 3 Dependabot alerts in its bundled launch-editor: one high (#316, the `fs.existsSync()` check can be bypassed on Windows) and two medium (#315, `%` not escaped on Windows; #317, editor CLI flags misread as commands). Dev server only; production builds do not ship it
+
 ## v0.9.0 - 2026-10-20
 
 ### Added
