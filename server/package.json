@@ -22,7 +22,7 @@
   "main": "app.js",
   "name": "tour-vibes-server",
   "overrides": {
-    "ip-address": "10.7.1",
+    "ip-address": "10.7.4",
     "brace-expansion@5": "5.0.12",
     "qs": ">=6.16.0"
   },
