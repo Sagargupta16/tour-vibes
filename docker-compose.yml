@@ -9,6 +9,11 @@
 services:
   mongo:
     image: mongo:8
+    environment:
+      # mongod refuses to start on Linux kernels 6.19.0 to 7.0.13 when tcmalloc uses
+      # per-CPU caches (SERVER-121912). rseq=1 lets glibc register rseq first, so
+      # tcmalloc falls back to per-thread caches and the startup check passes.
+      GLIBC_TUNABLES: glibc.pthread.rseq=1
     volumes:
       - mongo-data:/data/db
     healthcheck:
