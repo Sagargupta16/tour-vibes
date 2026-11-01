@@ -1,1 +1,11 @@
-{"$schema":"https://docs.renovatebot.com/renovate-schema.json","extends":["github>Sagargupta16/shared-workflows"]}
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>Sagargupta16/shared-workflows"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major"],
+      "enabled": false,
+      "description": "Major updates are paused for this repo. The 2026-11-01 grouped major PR carried 14 majors at once (Babel 8, ESLint 10, @vitejs/plugin-react 6, framer-motion 14, lucide-react 1, js-yaml 5, dotenv 18, mongo 9, Node 26, actions v7) and failed the client build, the compose smoke test and Renovate's lockfile update, so it could not go green. Security updates are unaffected -- vulnerabilityAlerts ignores packageRules. Minor and patch updates continue. Delete this rule when the majors are taken on deliberately, one at a time."
+    }
+  ]
+}
