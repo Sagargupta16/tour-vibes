@@ -54,23 +54,13 @@ Captured from the live demo build (`npm run build:demo`) with its seeded journal
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    U[Browser / phone] --> C[React 19 SPA<br/>Vite 8, Tailwind 4, shadcn/ui]
-    C -- "fetch + Bearer JWT" --> RL
-    C -. "static demo build" .-> MOCK[In-browser mock API<br/>localStorage + IndexedDB]
-    subgraph API[Express 5 API]
-        RL[express-rate-limit] --> AUTH[is-auth / optional-auth JWT check]
-        AUTH --> UP[multer upload<br/>PNG/JPG, 5MB]
-        UP --> V[express-validator]
-        V --> CTRL[controllers<br/>auth, feed, comment]
-    end
-    CTRL --> DB[(MongoDB<br/>User, Post, Comment)]
-    UP --> FS[(server/images)]
-    C -- "GET /images/..." --> FS
-    C -- "map tiles" --> OSM[OpenStreetMap tiles]
-    C -- "Find city (on click)" --> NOM[Nominatim geocoder]
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/architecture-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/diagrams/architecture-light.svg">
+  <img width="880" src="docs/diagrams/architecture-light.svg" alt="Tour Vibes architecture: in a browser or on a phone, the React 19 SPA (Vite 8, Tailwind 4, shadcn/ui) sends each API call with a Bearer JWT to the Express 5 API. There every call meets the middleware in one order: the express-rate-limit rate limit, the JWT check (optional on reads), the multer upload (PNG or JPG up to 5 MB), express-validator, and then the auth, feed, comment, like and map controllers, which read and write the User, Post and Comment collections in MongoDB through Mongoose. Multer writes uploaded photos to server/images, the controllers delete old photos and the uploads of failed requests there, and the SPA loads photos from it with GET /images/*. Leaflet loads map tiles from tile.openstreetmap.org, and the Find city button looks a place up with the Nominatim geocoder. The GitHub Pages demo build sends the same calls to a mock API inside the browser instead, which keeps its data in localStorage and IndexedDB.">
+</picture>
+
+The spec behind the picture is [`docs/diagrams/architecture.yaml`](docs/diagrams/architecture.yaml), rendered with [orrery](https://github.com/Sagargupta16/orrery).
 
 A request goes through the same layers in the same order: rate limit, JWT check, upload (only on the three routes that take a file), validation, then the controller. Reads use optional auth: no token is fine, a bad or expired one is still a 401. Because the upload runs after the JWT check, an anonymous request can never write to disk. The GitHub Pages build swaps `fetch` for a mock of the same routes that runs in the browser.
 
