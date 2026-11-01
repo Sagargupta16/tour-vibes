@@ -1,0 +1,102 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Sagargupta16/orrery/main/skills/orrery/references/diagram.schema.json
+# Rendered with orrery (github.com/Sagargupta16/orrery):
+#   orrery render docs/diagrams/architecture.yaml -o docs/diagrams/architecture -f svg --theme both
+# Reviewed at README width: orrery review docs/diagrams/architecture.yaml --width 880
+title: Tour Vibes architecture
+subtitle: Middleware runs in one fixed order before the controllers; the GitHub Pages demo build answers the same calls inside the browser
+direction: right
+layout: { spacing: compact }
+legend:
+  dashed: Static demo build only
+
+groups:
+  browser: { type: boundary, label: Browser or phone }
+  api: { type: box, label: Express 5 API, icon: si:express, evidence: "server/app.js:12#express" }
+  osm: { type: internet, label: OpenStreetMap }
+
+nodes:
+  spa:
+    icon: logos:react
+    label: React 19 SPA
+    note: "Vite 8, Tailwind 4, shadcn/ui"
+    in: browser
+    evidence: ["client/package.json:27#react", "client/src/lib/api.js:20#fetch"]
+  mock:
+    align: spa
+    icon: tabler:code
+    label: Mock API
+    note: localStorage + IndexedDB
+    in: browser
+    evidence: ["client/src/lib/api.js:16#VITE_STATIC_DEMO", "client/src/lib/demo/index.js:43#demoFetch"]
+  # The request pipeline in route order (server/routes/*.js). align stacks it in one column.
+  # Left out: the valid-id router.param guard, CORS and body-parser (server/app.js).
+  limit:
+    icon: tabler:gauge
+    label: Rate limit
+    note: express-rate-limit
+    in: api
+    evidence: ["server/routes/feed.js:22#apiLimiter", "server/routes/auth.js:15#authLimiter"]
+  auth:
+    align: limit
+    icon: logos:jwt-icon
+    label: JWT auth
+    note: optional on reads
+    in: api
+    evidence: ["server/middleware/is-auth.js:19#jwt.verify", "server/middleware/optional-auth.js:6#optionalAuth"]
+  upload:
+    align: limit
+    icon: tabler:upload
+    label: Multer upload
+    note: "PNG/JPG, 5 MB"
+    in: api
+    evidence: ["server/middleware/upload.js:32#fileSize", "server/routes/feed.js:65#upload"]
+  validate:
+    align: limit
+    icon: tabler:checklist
+    label: Validation
+    note: express-validator
+    in: api
+    evidence: ["server/routes/feed.js:65#postValidation", "server/routes/auth.js:93#signupValidation"]
+  controllers:
+    align: limit
+    icon: tabler:code
+    label: Controllers
+    note: "auth, feed, comment, like, map"
+    in: api
+    evidence: ["server/routes/feed.js:5#controllers", "server/routes/auth.js:5#authControllers"]
+  images:
+    icon: tabler:photo
+    label: server/images
+    note: uploads on disk
+    in: api
+    evidence: ["server/middleware/upload.js:15#images", "server/app.js:25#express.static", "docker-compose.yml:37#uploads"]
+  mongo:
+    icon: si:mongodb
+    label: MongoDB
+    note: "User, Post, Comment"
+    evidence: ["server/app.js:57#mongoose.connect", "docker-compose.yml:11#mongo"]
+  tiles:
+    icon: tabler:world-map
+    label: Map tiles
+    note: tile.openstreetmap.org
+    in: osm
+    evidence: "client/src/components/map/map-base.jsx:18#tile.openstreetmap.org"
+  nominatim:
+    icon: tabler:location-search
+    label: Nominatim
+    note: geocoder
+    in: osm
+    evidence: "client/src/lib/geocode.js:7#nominatim.openstreetmap.org"
+
+story: [spa, limit, auth, upload, validate, controllers, mongo]
+
+edges:
+  - spa -> limit: { label: Bearer JWT, evidence: "client/src/lib/api.js:28#Bearer" }
+  - limit -> auth -> upload -> validate -> controllers
+  - controllers -> mongo: Mongoose
+  - upload -> images: writes file
+  - controllers -> images: { label: deletes files, evidence: "server/util/helpers.js:25#unlink" }
+  - spa -> images: { label: "GET /images/*", evidence: "client/src/lib/api.js:10#API_URL" }
+  - spa -> tiles: Leaflet
+  - spa -> nominatim: { label: Find city, evidence: "client/src/components/map/location-picker.jsx:54#geocode" }
+  - spa --> mock: { label: demo build, evidence: "client/src/lib/api.js:17#demoFetch" }
